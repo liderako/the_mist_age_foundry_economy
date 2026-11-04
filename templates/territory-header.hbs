@@ -1,0 +1,26 @@
+<header class="mist-eco-header">
+	<img class="profile" src="{{actor.img}}" alt="{{actor.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}>
+	<div class="title">
+		<input class="name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize "Name"}}">
+		<div class="links">
+			{{#if isCountry}}<span class="hint">{{localize "TYPES.Actor.mist-age-economy.country"}}</span>
+			{{else if country}}<a data-action="openLink" data-uuid="{{country.uuid}}"><img src="{{country.img}}" alt=""> {{country.name}}</a>
+			{{else}}<span class="hint">{{localize "MIST_ECO.Territory.NoCountry"}}</span>{{/if}}
+		</div>
+		<div class="calendar">
+			<i class="fa-solid fa-calendar-days" inert></i> <span>{{date}}</span>
+			{{#if isGM}}
+			<button type="button" data-action="nextDay" data-tooltip="MIST_ECO.Days.NextHint"><i class="fa-solid fa-sun" inert></i> {{localize "MIST_ECO.Days.Next"}}</button>
+			<button type="button" data-action="passDays" data-tooltip="MIST_ECO.Days.PassHint"><i class="fa-solid fa-forward" inert></i></button>
+			{{/if}}
+		</div>
+	</div>
+	<div class="summary">
+		<span data-tooltip="MIST_ECO.Territory.Cities"><i class="fa-solid fa-city" inert></i> {{cities.length}}</span>
+		<span data-tooltip="MIST_ECO.Resources.population"><i class="{{icons.population}}" inert></i> {{totals.population}}</span>
+		<span data-tooltip="MIST_ECO.Resources.guards"><i class="{{icons.guards}}" inert></i> {{totals.guards}}</span>
+		{{#each counterTotals}}
+		<span data-tooltip="{{label}}"><i class="{{icon}}" inert></i> {{value}}/{{max}}</span>
+		{{/each}}
+	</div>
+</header>

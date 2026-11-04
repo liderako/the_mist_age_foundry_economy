@@ -1,0 +1,26 @@
+<header class="mist-eco-header">
+	<img class="profile" src="{{actor.img}}" alt="{{actor.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}>
+	<div class="title">
+		<input class="name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize "Name"}}">
+		<div class="links">
+			{{#if country}}<a data-action="openLink" data-uuid="{{country.uuid}}"><img src="{{country.img}}" alt=""> {{country.name}}</a> ›{{/if}}
+			{{#if region}}<a data-action="openLink" data-uuid="{{region.uuid}}"><img src="{{region.img}}" alt=""> {{region.name}}</a>{{else}}<span class="hint">{{localize "MIST_ECO.City.NoRegion"}}</span>{{/if}}
+		</div>
+		<div class="calendar">
+			<i class="fa-solid fa-calendar-days" inert></i> <span>{{date}}</span>
+			{{#if isGM}}
+			<button type="button" data-action="nextDay" data-tooltip="MIST_ECO.Days.NextHint"><i class="fa-solid fa-sun" inert></i> {{localize "MIST_ECO.Days.Next"}}</button>
+			<button type="button" data-action="passDays" data-tooltip="MIST_ECO.Days.PassHint"><i class="fa-solid fa-forward" inert></i></button>
+			{{/if}}
+		</div>
+	</div>
+	<div class="summary">
+		{{#each people}}
+		<span data-tooltip="{{label}}"><i class="{{icon}}" inert></i> {{value}}</span>
+		{{/each}}
+		{{#each counters}}
+		<span data-tooltip="{{label}}"><i class="{{icon}}" inert></i> {{value}}/{{max}}</span>
+		{{/each}}
+	</div>
+	{{#if alerts}}<p class="mist-eco-alerts negative"><i class="fa-solid fa-triangle-exclamation" inert></i> {{alerts}}</p>{{/if}}
+</header>

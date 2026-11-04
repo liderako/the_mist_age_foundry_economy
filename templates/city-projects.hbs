@@ -1,0 +1,57 @@
+<section class="tab mist-eco-projects {{tab.cssClass}}" data-tab="projects" data-group="primary">
+	{{#if editable}}
+	<div class="mist-eco-toolbar">
+		<button type="button" data-action="createProject"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Project.Create"}}</button>
+	</div>
+	{{/if}}
+	{{#each sections}}
+	<h3 class="mist-eco-section status-{{status}}">{{label}} <span class="count">{{projects.length}}</span></h3>
+	{{#unless projects.length}}<p class="hint">{{localize "MIST_ECO.Project.None"}}</p>{{/unless}}
+	<ol class="mist-eco-project-list">
+		{{#each projects}}
+		<li class="mist-eco-project status-{{status}}" data-project-id="{{id}}">
+			<img src="{{img}}" alt="">
+			<div class="body">
+				<header>
+					<span class="name">{{name}}</span>
+					{{#if repeat}}<i class="fa-solid fa-rotate" data-tooltip="MIST_ECO.Project.Repeats" inert></i>{{/if}}
+				</header>
+				{{#if ongoing}}
+				<div class="progress"><span class="hint">{{localize "MIST_ECO.Project.Ongoing"}}</span></div>
+				{{else}}
+				<div class="progress">
+					<div class="mist-eco-bar"><span style="width: {{percent}}%"></span></div>
+					<span>{{localize "MIST_ECO.Project.DaysOf" progress=progress days=days}}</span>
+				</div>
+				{{/if}}
+				<dl>
+					{{#if cost}}<dt>{{localize "MIST_ECO.Project.Cost"}}</dt><dd>{{cost}}</dd>{{/if}}
+					{{#if workers}}<dt>{{localize "MIST_ECO.Project.Workers"}}</dt><dd>{{workers}}</dd>{{/if}}
+					{{#if rewards}}<dt>{{localize "MIST_ECO.Project.Rewards"}}</dt><dd>{{rewards}}</dd>{{/if}}
+					{{#if unlocks}}<dt>{{localize "MIST_ECO.Project.Unlocks"}}</dt><dd>{{unlocks}}</dd>{{/if}}
+					{{#if grants}}<dt>{{localize "MIST_ECO.Features.Leaves"}}</dt><dd>{{grants}}</dd>{{/if}}
+				</dl>
+				{{#if description}}
+				<details>
+					<summary>{{localize "MIST_ECO.Project.Description"}}</summary>
+					<div class="description">{{{description}}}</div>
+				</details>
+				{{/if}}
+			</div>
+			{{#if @root.editable}}
+			<div class="controls">
+				{{#if canStart}}<button type="button" data-action="startProject" data-tooltip="MIST_ECO.Project.Start"><i class="fa-solid fa-play" inert></i></button>{{/if}}
+				{{#if canPause}}<button type="button" data-action="pauseProject" data-tooltip="MIST_ECO.Project.Pause"><i class="fa-solid fa-pause" inert></i></button>{{/if}}
+				{{#if canResume}}<button type="button" data-action="resumeProject" data-tooltip="MIST_ECO.Project.Resume"><i class="fa-solid fa-play" inert></i></button>{{/if}}
+				{{#if canUnlock}}<button type="button" data-action="unlockProject" data-tooltip="MIST_ECO.Project.Unlock"><i class="fa-solid fa-lock-open" inert></i></button>{{/if}}
+				{{#if canReopen}}<button type="button" data-action="reopenProject" data-tooltip="MIST_ECO.Project.Reopen"><i class="fa-solid fa-arrow-rotate-left" inert></i></button>{{/if}}
+				<button type="button" data-action="copyProject" data-tooltip="MIST_ECO.Project.Copy"><i class="fa-solid fa-copy" inert></i></button>
+				<button type="button" data-action="editProject" data-tooltip="MIST_ECO.Project.Edit"><i class="fa-solid fa-pen" inert></i></button>
+				<button type="button" data-action="deleteProject" data-tooltip="MIST_ECO.Project.Delete"><i class="fa-solid fa-trash" inert></i></button>
+			</div>
+			{{/if}}
+		</li>
+		{{/each}}
+	</ol>
+	{{/each}}
+</section>

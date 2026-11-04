@@ -1,0 +1,76 @@
+<section class="tab mist-eco-overview {{tab.cssClass}}" data-tab="overview" data-group="primary">
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Groups.Title"}}</h3>
+	<p class="mist-eco-people-summary">
+		<i class="{{icons.population}}" inert></i> {{localize "MIST_ECO.Resources.population"}}: <strong>{{system.population}}</strong> ·
+		<i class="{{icons.guards}}" inert></i> {{localize "MIST_ECO.Resources.guards"}}: <strong>{{system.guards}}</strong> ·
+		<span class="{{#if workers.short}}negative{{/if}}">{{localize "MIST_ECO.City.Workers" busy=workers.busy free=workers.free}}</span>
+	</p>
+	<table class="mist-eco-table mist-eco-groups">
+		<thead>
+			<tr>
+				<th class="name">{{localize "MIST_ECO.Groups.Name"}}</th>
+				<th>{{localize "MIST_ECO.Groups.Count"}}</th>
+				<th data-tooltip="MIST_ECO.Groups.GuardHint">{{localize "MIST_ECO.Groups.Guard"}}</th>
+				<th data-tooltip="MIST_ECO.Groups.CanWorkHint">{{localize "MIST_ECO.Groups.CanWork"}}</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each groups}}
+			<tr data-group-id="{{id}}">
+				<td class="name"><i class="{{icon}}" inert></i> <input type="text" name="groups.{{id}}.name" value="{{name}}"></td>
+				<td><input type="number" name="groups.{{id}}.count" value="{{count}}" min="0" step="1"></td>
+				<td><input type="checkbox" name="groups.{{id}}.guard" {{#if guard}}checked{{/if}}></td>
+				<td><input type="checkbox" name="groups.{{id}}.canWork" {{#if canWork}}checked{{/if}}></td>
+				<td class="controls">{{#if @root.editable}}<button type="button" class="icon fa-solid fa-trash" data-action="deleteGroup" data-tooltip="MIST_ECO.Groups.Delete"></button>{{/if}}</td>
+			</tr>
+			{{else}}
+			<tr><td colspan="5" class="hint">{{localize "MIST_ECO.Groups.None"}}</td></tr>
+			{{/each}}
+		</tbody>
+	</table>
+	{{#if editable}}
+	<div class="mist-eco-toolbar">
+		<button type="button" data-action="addGroup" data-guard="false"><i class="{{icons.population}}" inert></i> {{localize "MIST_ECO.Groups.AddResidents"}}</button>
+		<button type="button" data-action="addGroup" data-guard="true"><i class="{{icons.guards}}" inert></i> {{localize "MIST_ECO.Groups.AddGuards"}}</button>
+	</div>
+	{{/if}}
+
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Counters.Title"}}</h3>
+	<p class="hint">{{localize "MIST_ECO.Counters.Hint"}}</p>
+	<div class="mist-eco-counters">
+		{{#each counters}}
+		<div class="mist-eco-counter" data-counter data-key="{{key}}">
+			<header>
+				<i class="{{icon}}" inert></i> <span class="label">{{label}}</span>
+				<span class="value">{{value}} / {{max}}</span>
+			</header>
+			{{#if boxes}}
+			<div class="mist-eco-boxes">
+				{{#each boxes}}
+				<button type="button" class="mist-eco-box {{#if filled}}filled{{/if}}" data-action="setCounter" data-value="{{index}}" aria-label="{{index}}"></button>
+				{{else}}
+				<span class="hint">{{localize "MIST_ECO.Counters.NoMax"}}</span>
+				{{/each}}
+			</div>
+			{{else}}
+			<div class="mist-eco-stepper">
+				<button type="button" data-action="adjustCounter" data-delta="-1"><i class="fa-solid fa-minus" inert></i></button>
+				<span class="value">{{value}}</span>
+				<button type="button" data-action="adjustCounter" data-delta="1"><i class="fa-solid fa-plus" inert></i></button>
+			</div>
+			{{/if}}
+			<label class="mist-eco-max">
+				{{localize "MIST_ECO.Counters.BaseMax"}}
+				<input type="number" name="system.counters.{{key}}.max" value="{{baseMax}}" min="0" step="1">
+				{{#if bonusMax}}<span class="mist-eco-effective" data-tooltip="MIST_ECO.Counters.BonusHint">{{bonusMax}}</span>{{/if}}
+			</label>
+		</div>
+		{{/each}}
+	</div>
+
+	<fieldset class="mist-eco-description">
+		<legend>{{localize "MIST_ECO.Overview.Description"}}</legend>
+		<prose-mirror name="system.description" value="{{system.description}}" toggled="true">{{{enrichedDescription}}}</prose-mirror>
+	</fieldset>
+</section>

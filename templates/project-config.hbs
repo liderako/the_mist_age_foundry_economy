@@ -1,0 +1,132 @@
+<section class="mist-eco-project-form">
+	<div class="form-group">
+		<label>{{localize "MIST_ECO.Project.Name"}}</label>
+		<div class="form-fields">
+			<input type="text" name="name" value="{{project.name}}" required>
+		</div>
+	</div>
+	<div class="form-group">
+		<label>{{localize "MIST_ECO.Project.Image"}}</label>
+		<div class="form-fields">
+			<file-picker name="img" type="image" value="{{project.img}}"></file-picker>
+		</div>
+	</div>
+	<div class="form-group">
+		<label>{{localize "MIST_ECO.Project.Status"}}</label>
+		<div class="form-fields">
+			<select name="status">
+				{{#each statuses}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+			</select>
+		</div>
+	</div>
+
+	<fieldset>
+		<legend>{{localize "MIST_ECO.Project.Work"}}</legend>
+		<div class="form-group">
+			<label>{{localize "MIST_ECO.Project.Days"}}</label>
+			<div class="form-fields">
+				<input type="number" name="days" value="{{project.days}}" min="0" step="1">
+			</div>
+			<p class="hint">{{localize "MIST_ECO.Project.DaysHint"}}</p>
+		</div>
+		<div class="form-group">
+			<label>{{localize "MIST_ECO.Project.Progress"}}</label>
+			<div class="form-fields">
+				<input type="number" name="progress" value="{{project.progress}}" min="0" step="1">
+			</div>
+		</div>
+		<div class="form-group">
+			<label>{{localize "MIST_ECO.Project.Repeat"}}</label>
+			<div class="form-fields">
+				<input type="checkbox" name="repeat" {{#if project.repeat}}checked{{/if}}>
+			</div>
+			<p class="hint">{{localize "MIST_ECO.Project.RepeatHint"}}</p>
+		</div>
+		<div class="form-group">
+			<label>{{localize "MIST_ECO.Project.Workers"}}</label>
+			<div class="form-fields">
+				<input type="number" name="workers" value="{{project.workers}}" min="0" step="1">
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend>{{localize "MIST_ECO.Project.Cost"}}</legend>
+		<p class="hint">{{localize "MIST_ECO.Project.CostHint"}}</p>
+		{{#each costs}}
+		<div class="form-group">
+			<label>{{label}}</label>
+			<div class="form-fields">
+				<input type="number" name="cost.{{key}}" value="{{value}}" min="0" step="1">
+			</div>
+		</div>
+		{{/each}}
+	</fieldset>
+
+	<fieldset>
+		<legend>{{localize "MIST_ECO.Project.Rewards"}}</legend>
+		<p class="hint">{{localize "MIST_ECO.Project.RewardsHint"}}</p>
+		{{#each rewards}}
+		<div class="mist-eco-reward" data-mode="{{mode}}">
+			<select name="rewards.{{index}}.target">
+				{{#each targets}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+			</select>
+			<select name="rewards.{{index}}.mode" data-reward-mode>
+				<option value="fixed" {{#if (eq mode "fixed")}}selected{{/if}}>{{localize "MIST_ECO.Reward.Fixed"}}</option>
+				<option value="range" {{#if (eq mode "range")}}selected{{/if}}>{{localize "MIST_ECO.Reward.Range"}}</option>
+			</select>
+			<label class="fixed">{{localize "MIST_ECO.Reward.Amount"}} <input type="number" name="rewards.{{index}}.amount" value="{{amount}}" step="1"></label>
+			<label class="range">{{localize "MIST_ECO.Reward.From"}} <input type="number" name="rewards.{{index}}.min" value="{{min}}" step="1"></label>
+			<label class="range">{{localize "MIST_ECO.Reward.To"}} <input type="number" name="rewards.{{index}}.max" value="{{max}}" step="1"></label>
+			<label class="range" data-tooltip="MIST_ECO.Reward.WholeHint"><input type="checkbox" name="rewards.{{index}}.whole" {{#if whole}}checked{{/if}}> {{localize "MIST_ECO.Reward.Whole"}}</label>
+			<label data-tooltip="MIST_ECO.Reward.ChanceHint">{{localize "MIST_ECO.Reward.Chance"}} <input type="number" name="rewards.{{index}}.chance" value="{{chancePercent}}" min="0" max="100" step="1">%</label>
+			<button type="button" class="icon fa-solid fa-trash" data-action="removeReward" data-index="{{index}}" data-tooltip="MIST_ECO.Reward.Remove"></button>
+		</div>
+		{{/each}}
+		<button type="button" data-action="addReward"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Reward.Add"}}</button>
+	</fieldset>
+
+	<fieldset class="mist-eco-grants">
+		<legend>{{localize "MIST_ECO.Features.Grants"}}</legend>
+		<p class="hint">{{localize "MIST_ECO.Features.GrantsHint"}}</p>
+		{{#each grants}}
+		<div class="mist-eco-grant">
+			<img src="{{img}}" alt="">
+			<input type="hidden" name="grants.{{index}}.img" value="{{img}}">
+			<input type="hidden" name="grants.{{index}}.uuid" value="{{uuid}}">
+			{{#if linked}}
+			<span class="linked" data-tooltip="MIST_ECO.Features.LinkedHint"><i class="fa-solid fa-link" inert></i> {{name}}<input type="hidden" name="grants.{{index}}.name" value="{{name}}"></span>
+			{{else}}
+			<input type="text" name="grants.{{index}}.name" value="{{name}}" placeholder="{{localize "MIST_ECO.Features.Name"}}">
+			{{/if}}
+			<select name="grants.{{index}}.target">
+				{{#each targets}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+			</select>
+			<button type="button" class="icon fa-solid fa-trash" data-action="removeGrant" data-index="{{index}}" data-tooltip="MIST_ECO.Features.Delete"></button>
+			{{#if linked}}
+			<button type="button" class="unlink" data-action="unlinkGrant" data-index="{{index}}"><i class="fa-solid fa-link-slash" inert></i> {{localize "MIST_ECO.Features.Unlink"}}</button>
+			{{else}}
+			<textarea name="grants.{{index}}.description" rows="2" placeholder="{{localize "MIST_ECO.Features.DescriptionHint"}}">{{description}}</textarea>
+			{{/if}}
+		</div>
+		{{/each}}
+		<button type="button" data-action="addGrant"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Features.AddGrant"}}</button>
+	</fieldset>
+
+	{{#if others.length}}
+	<fieldset>
+		<legend>{{localize "MIST_ECO.Project.Unlocks"}}</legend>
+		<p class="hint">{{localize "MIST_ECO.Project.UnlocksHint"}}</p>
+		<div class="mist-eco-unlocks">
+			{{#each others}}
+			<label><input type="checkbox" name="unlocks.{{id}}" {{#if checked}}checked{{/if}}> {{name}} <span class="hint">({{status}})</span></label>
+			{{/each}}
+		</div>
+	</fieldset>
+	{{/if}}
+
+	<fieldset class="mist-eco-description">
+		<legend>{{localize "MIST_ECO.Project.Description"}}</legend>
+		<prose-mirror name="description" value="{{project.description}}" toggled="true">{{{enrichedDescription}}}</prose-mirror>
+	</fieldset>
+</section>

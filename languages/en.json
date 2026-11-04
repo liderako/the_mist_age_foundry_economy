@@ -1,0 +1,235 @@
+{
+	"TYPES": {
+		"Actor": {
+			"mist-age-economy": {
+				"city": "City",
+				"region": "Region",
+				"country": "Country"
+			}
+		}
+	},
+	"MIST_ECO": {
+		"Delete": "Remove",
+		"DeleteTitle": "Remove",
+		"DeleteConfirm": "Remove {name}? Hold Shift to skip this question.",
+		"Status": {
+			"active": "Active",
+			"paused": "Paused",
+			"available": "Available",
+			"locked": "Locked",
+			"completed": "Completed"
+		},
+		"Project": {
+			"New": "New project",
+			"Title": "Project",
+			"Create": "Create project",
+			"Save": "Save project",
+			"Name": "Name",
+			"Image": "Image",
+			"Status": "Status",
+			"Work": "Work",
+			"Days": "Days per cycle",
+			"DaysHint": "0 for a project that just keeps going, such as a workshop in use; it gives its rewards every day.",
+			"Progress": "Days worked",
+			"Repeat": "Repeats",
+			"RepeatHint": "After its days the project gives its rewards and starts over instead of being completed.",
+			"Workers": "Residents at work",
+			"Cost": "Cost",
+			"CostHint": "Paid once, when the project starts.",
+			"Rewards": "Rewards",
+			"RewardsHint": "Given each time the project finishes its days. A reward to a group adds people to it.",
+			"Unlocks": "Unlocks",
+			"UnlocksHint": "Locked projects that become available when this one is completed.",
+			"Description": "Description",
+			"None": "No projects.",
+			"Repeats": "Repeats",
+			"Ongoing": "Ongoing",
+			"DaysOf": "{progress} / {days} days",
+			"Unnamed": "({count} of them not named yet; choose who with the workers button)",
+			"Start": "Start",
+			"Pause": "Pause",
+			"Resume": "Resume",
+			"Unlock": "Make available",
+			"Reopen": "Make available again",
+			"Edit": "Edit",
+			"Delete": "Delete project",
+			"DeleteConfirm": "Delete the project {name}?",
+			"MissingPeople": "{count} free residents",
+			"Shortfall": "Not enough: {missing}. Start anyway?",
+			"Move": "Move to another base",
+			"MoveTitle": "Move {name}",
+			"Copy": "Copy to other bases",
+			"CopyTitle": "Copy {name}",
+			"CopyHint": "Each chosen city gets its own copy that has not started.",
+			"Copied": "{name} copied to {cities}.",
+			"Needs": "{count} needed",
+			"NoCities": "There is no other city."
+		},
+		"Reward": {
+			"Fixed": "Fixed",
+			"Range": "Range",
+			"Amount": "Amount",
+			"From": "From",
+			"To": "To",
+			"Whole": "Whole",
+			"WholeHint": "Rolls a whole number from From to To, for things counted one by one.",
+			"Chance": "Chance",
+			"ChanceHint": "How often the reward comes: 100% always, 50% every other time on average.",
+			"Remove": "Remove reward",
+			"Add": "Add reward",
+			"NewGroup": "(new in this base)"
+		},
+		"Features": {
+			"Hint": "Features work like an adversary's: Daggerheart feature items with a description and their own effects. A region's or country's features reach every city inside.",
+			"New": "New feature",
+			"Title": "Feature",
+			"Add": "Add feature",
+			"Save": "Save feature",
+			"Edit": "Edit feature",
+			"Delete": "Remove feature",
+			"Name": "Name",
+			"Source": "Where it came from",
+			"SourceHint": "A project, an event, a deal…",
+			"From": "from {source}",
+			"None": "No features yet.",
+			"Grants": "Features on completion",
+			"GrantsHint": "When this project is completed (not each cycle of a repeating one), these features are added to its base or to the headquarters. Drag a feature item here to grant a copy of it, effects included; or name a plain one. A base without a headquarters keeps both.",
+			"AddGrant": "Add a feature",
+			"DescriptionHint": "What it gives; each line becomes a paragraph",
+			"Leaves": "Leaves",
+			"LinkedHint": "When the project completes, a copy of this item is added, with its effects.",
+			"Unlink": "Make a plain feature",
+			"Target": {
+				"city": "This city",
+				"region": "Region",
+				"country": "Country"
+			}
+		},
+		"Effects": {
+			"Title": "Effects",
+			"Add": "Add effect",
+			"New": "New effect",
+			"Edit": "Edit effect",
+			"Toggle": "Turn on or off",
+			"Delete": "Remove effect",
+			"None": "No effects of its own.",
+			"KeysTitle": "What effects can change",
+			"KeysHint": "Use these keys on an effect's Changes tab, on the actor or on a feature, with the Add mode: 3 for +3, -1 for −1.",
+			"Hint": "Effects move a city's counters: a plantation raises the Supplies maximum, a riot lowers Order. A region's or country's effects change its bonuses, which reach every city inside.",
+			"FromFeatures": "From features",
+			"Keys": {
+				"max": "maximum of a counter (Add 3: three plantations)",
+				"value": "value of a counter",
+				"bonusMax": "maximum of a counter in every city inside",
+				"bonusValue": "value of a counter in every city inside",
+				"counters": "Counters:"
+			}
+		},
+		"Days": {
+			"Next": "Next day",
+			"NextHint": "Moves the world time one day forward. Projects work and everyone eats.",
+			"Pass": "Pass",
+			"PassHint": "Let several days pass",
+			"PassTitle": "Let days pass",
+			"Count": "Days"
+		},
+		"Day": "Day {day}",
+		"Sheets": {
+			"city": "City Sheet",
+			"region": "Region Sheet",
+			"country": "Country Sheet"
+		},
+		"Tabs": {
+			"overview": "Overview",
+			"projects": "Projects",
+			"features": "Features",
+			"effects": "Effects"
+		},
+		"Resources": {
+			"supplies": "Supplies",
+			"materials": "Materials",
+			"stability": "Stability",
+			"order": "Order",
+			"faith": "Faith",
+			"power": "Power",
+			"population": "Population",
+			"guards": "Guards"
+		},
+		"Counters": {
+			"Title": "Counters",
+			"Hint": "Each counter is a tracker like in Daggerheart: features raise its maximum (three plantations around the city: Supplies max +3), the GM moves its value. Click a box to set it; click the last filled box to clear it.",
+			"BaseMax": "Own maximum",
+			"BonusHint": "Added by effects of the city, its region and its country",
+			"NoMax": "No maximum yet: give the city a feature or set its own maximum."
+		},
+		"Groups": {
+			"Title": "People",
+			"Name": "Group",
+			"Count": "Count",
+			"Guard": "Guards",
+			"GuardHint": "Guards keep watch: they count as guards, not residents.",
+			"CanWork": "Works",
+			"CanWorkHint": "People of this group can be taken for projects.",
+			"Delete": "Remove group",
+			"None": "No groups yet.",
+			"AddResidents": "Add residents",
+			"AddGuards": "Add guards",
+			"NewResidents": "New residents",
+			"NewGuards": "New guards",
+			"Default": {
+				"population": "Residents",
+				"guards": "Guards"
+			}
+		},
+		"City": {
+			"NoRegion": "No region",
+			"Workers": "{busy} on projects, {free} free"
+		},
+		"Overview": {
+			"Description": "Description"
+		},
+		"Bonuses": {
+			"Title": "Bonuses to every city",
+			"Hint": "A region or country has no counters of its own: it shows the sums of its cities. What is set here, and what its features' effects add, goes to every city inside.",
+			"Value": "Value",
+			"Max": "Maximum",
+			"FromEffects": "Effects",
+			"ValueEffects": "value {value}",
+			"MaxEffects": "maximum {max}"
+		},
+		"Alerts": {
+			"workers": "more work than free residents",
+			"stability": "stability at zero",
+			"order": "order at zero"
+		},
+		"Report": {
+			"Speaker": "Economy",
+			"Days": "{days} day(s) passed",
+			"Yields": "Projects brought:",
+			"Completed": "Completed:",
+			"Unlocked": "Now available:",
+			"Features": "New features:",
+			"Lost": "No room for: {lost}."
+		},
+		"Territory": {
+			"NoCountry": "No country",
+			"Regions": "Regions",
+			"Region": "Region",
+			"Cities": "Cities",
+			"City": "City",
+			"NewRegion": "New region",
+			"NewCity": "New city",
+			"Name": "Name",
+			"Create": "Create",
+			"DropRegion": "Drag a region here to add it to this country.",
+			"DropCity": "Drag a city here to add it to this region.",
+			"NoRegions": "No regions yet.",
+			"NoCities": "No cities yet.",
+			"Total": "Total",
+			"Alerts": "Attention",
+			"ActiveProjects": "Active projects",
+			"Detach": "Remove",
+			"DetachConfirm": "Remove {name} from {parent}? It keeps everything it has."
+		}
+	}
+}

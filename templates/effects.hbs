@@ -1,0 +1,62 @@
+<section class="tab mist-eco-effects {{tab.cssClass}}" data-tab="effects" data-group="primary">
+	<p class="hint">{{localize "MIST_ECO.Effects.Hint"}}</p>
+	{{#each featureGroups}}
+	<div class="mist-eco-feature-group" data-actor-uuid="{{uuid}}">
+		{{#if heading}}
+		<h3 class="mist-eco-section"><img src="{{img}}" alt=""> {{heading}} <span class="count">{{effects.length}}</span></h3>
+		{{/if}}
+		{{#if editable}}
+		<div class="mist-eco-toolbar">
+			<button type="button" data-action="addEffect"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Effects.Add"}}</button>
+		</div>
+		{{/if}}
+		{{#if effects.length}}
+		<ol class="mist-eco-effect-list">
+			{{#each effects}}
+			<li class="mist-eco-effect {{#if disabled}}disabled{{/if}}" data-effect-id="{{id}}">
+				<img src="{{img}}" alt="">
+				<span class="name">{{name}}</span>
+				<span class="hint changes">{{changes}}</span>
+				{{#if ../editable}}
+				<span class="controls">
+					<button type="button" class="icon fa-solid {{#if disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}" data-action="toggleEffect" data-tooltip="MIST_ECO.Effects.Toggle"></button>
+					<button type="button" class="icon fa-solid fa-pen" data-action="editEffect" data-tooltip="MIST_ECO.Effects.Edit"></button>
+					<button type="button" class="icon fa-solid fa-trash" data-action="deleteEffect" data-tooltip="MIST_ECO.Effects.Delete"></button>
+				</span>
+				{{/if}}
+			</li>
+			{{/each}}
+		</ol>
+		{{else}}
+		<p class="hint">{{localize "MIST_ECO.Effects.None"}}</p>
+		{{/if}}
+		{{#if featureEffects.length}}
+		<h4 class="mist-eco-effects-title"><i class="fa-solid fa-star" inert></i> {{localize "MIST_ECO.Effects.FromFeatures"}}</h4>
+		<ol class="mist-eco-effect-list">
+			{{#each featureEffects}}
+			<li class="mist-eco-effect {{#if disabled}}disabled{{/if}}" data-item-id="{{itemId}}">
+				<img src="{{img}}" alt="">
+				<span class="name">{{name}}</span>
+				<span class="hint changes">{{feature}}{{#if changes}} · {{changes}}{{/if}}</span>
+				{{#if ../editable}}<span class="controls"><button type="button" class="icon fa-solid fa-star" data-action="editFeature" data-tooltip="MIST_ECO.Features.Edit"></button></span>{{/if}}
+			</li>
+			{{/each}}
+		</ol>
+		{{/if}}
+	</div>
+	{{/each}}
+	<details class="mist-eco-effect-keys" open>
+		<summary>{{localize "MIST_ECO.Effects.KeysTitle"}}</summary>
+		<p class="hint">{{localize "MIST_ECO.Effects.KeysHint"}}</p>
+		<ul>
+			{{#if isCity}}
+			<li><code>system.counters.supplies.max</code> — {{localize "MIST_ECO.Effects.Keys.max"}}</li>
+			<li><code>system.counters.supplies.value</code> — {{localize "MIST_ECO.Effects.Keys.value"}}</li>
+			{{else}}
+			<li><code>system.bonuses.supplies.max</code> — {{localize "MIST_ECO.Effects.Keys.bonusMax"}}</li>
+			<li><code>system.bonuses.supplies.value</code> — {{localize "MIST_ECO.Effects.Keys.bonusValue"}}</li>
+			{{/if}}
+			<li>{{localize "MIST_ECO.Effects.Keys.counters"}} <code>supplies</code> · <code>materials</code> · <code>stability</code> · <code>order</code> · <code>faith</code> · <code>power</code></li>
+		</ul>
+	</details>
+</section>

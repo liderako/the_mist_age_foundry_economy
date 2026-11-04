@@ -1,0 +1,18 @@
+<div class="mist-eco-report">
+	<h3><i class="fa-solid fa-scale-unbalanced" inert></i> {{localize "MIST_ECO.Report.Days" days=days}}</h3>
+	<p class="mist-eco-report-date">{{date}}</p>
+	{{#each cities}}
+	<section class="mist-eco-report-city">
+		<h4><img src="{{img}}" alt=""> {{name}}{{#if place}} <span class="hint">({{place}})</span>{{/if}}</h4>
+		{{#if gains}}<p>{{gains}}</p>{{/if}}
+		{{#if yields.length}}
+		<p><strong>{{localize "MIST_ECO.Report.Yields"}}</strong></p>
+		<ul>{{#each yields}}<li>{{name}}: {{gains}}</li>{{/each}}</ul>
+		{{/if}}
+		{{#if completed.length}}<p><strong>{{localize "MIST_ECO.Report.Completed"}}</strong> {{#each completed}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+		{{#if unlocked.length}}<p><strong>{{localize "MIST_ECO.Report.Unlocked"}}</strong> {{#each unlocked}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+		{{#if features.length}}<p><strong>{{localize "MIST_ECO.Report.Features"}}</strong> {{#each features}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+		{{#if lost}}<p class="negative">{{localize "MIST_ECO.Report.Lost" lost=lost}}</p>{{/if}}
+	</section>
+	{{/each}}
+</div>

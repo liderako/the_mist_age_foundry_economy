@@ -1,0 +1,45 @@
+<section class="tab mist-eco-features {{tab.cssClass}}" data-tab="features" data-group="primary">
+	<p class="hint">{{localize "MIST_ECO.Features.Hint"}}</p>
+	{{#each featureGroups}}
+	<div class="mist-eco-feature-group" data-actor-uuid="{{uuid}}">
+		{{#if heading}}
+		<h3 class="mist-eco-section"><img src="{{img}}" alt=""> {{heading}} <span class="count">{{features.length}}</span></h3>
+		{{/if}}
+		{{#if editable}}
+		<div class="mist-eco-toolbar">
+			<button type="button" data-action="addFeature"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Features.Add"}}</button>
+		</div>
+		{{/if}}
+		{{#if features.length}}
+		<ol class="mist-eco-feature-list">
+			{{#each features}}
+			<li class="mist-eco-feature" data-item-id="{{id}}">
+				<img src="{{img}}" alt="" {{#if ../editable}}data-action="editFeature"{{/if}}>
+				<div class="body">
+					<header>
+						<span class="name">{{name}}</span>
+						{{#if source}}<span class="hint">{{localize "MIST_ECO.Features.From" source=source}}</span>{{/if}}
+					</header>
+					{{#if description}}<div class="description">{{{description}}}</div>{{/if}}
+					{{#if effects.length}}
+					<ul class="mist-eco-feature-effects">
+						{{#each effects}}<li class="{{#if disabled}}disabled{{/if}}"><img src="{{img}}" alt=""> {{name}}</li>{{/each}}
+					</ul>
+					{{/if}}
+				</div>
+				{{#if ../editable}}
+				<div class="controls">
+					<button type="button" class="icon fa-solid fa-pen" data-action="editFeature" data-tooltip="MIST_ECO.Features.Edit"></button>
+					<button type="button" class="icon fa-solid fa-trash" data-action="deleteFeature" data-tooltip="MIST_ECO.Features.Delete"></button>
+				</div>
+				{{/if}}
+			</li>
+			{{/each}}
+		</ol>
+		{{else}}
+		<p class="hint">{{localize "MIST_ECO.Features.None"}}</p>
+		{{/if}}
+
+	</div>
+	{{/each}}
+</section>

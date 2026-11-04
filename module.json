@@ -1,0 +1,63 @@
+{
+	"id": "mist-age-economy",
+	"title": "The Mist Age - Simulation Economy",
+	"description": "City, region and country actors for Daggerheart, nested country → region → city: population and guards, counters of supplies, materials, stability, order, faith and power kept like Daggerheart trackers whose maxima features raise, projects that run with the world time, and Daggerheart features and effects; a region or country shows the sums of its cities and gives bonuses to every city inside.",
+	"version": "0.1.0",
+	"compatibility": {
+		"minimum": "13",
+		"verified": "14"
+	},
+	"authors": [
+		{
+			"name": "asvirido"
+		}
+	],
+	"relationships": {
+		"systems": [
+			{
+				"id": "daggerheart",
+				"type": "system"
+			}
+		]
+	},
+	"documentTypes": {
+		"Actor": {
+			"city": {
+				"htmlFields": [
+					"description"
+				]
+			},
+			"region": {
+				"htmlFields": [
+					"description"
+				]
+			},
+			"country": {
+				"htmlFields": [
+					"description"
+				]
+			}
+		}
+	},
+	"esmodules": [
+		"scripts/main.js"
+	],
+	"styles": [
+		"styles/economy.css"
+	],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "languages/en.json"
+		},
+		{
+			"lang": "ru",
+			"name": "Русский",
+			"path": "languages/ru.json"
+		}
+	],
+	"url": "",
+	"manifest": "",
+	"download": ""
+}

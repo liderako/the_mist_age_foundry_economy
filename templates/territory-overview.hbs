@@ -1,0 +1,112 @@
+<section class="tab mist-eco-overview {{tab.cssClass}}" data-tab="overview" data-group="primary">
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Bonuses.Title"}}</h3>
+	<p class="hint">{{localize "MIST_ECO.Bonuses.Hint"}}</p>
+	<table class="mist-eco-table mist-eco-bonuses">
+		<thead>
+			<tr>
+				<th class="name"></th>
+				<th>{{localize "MIST_ECO.Bonuses.Value"}}</th>
+				<th>{{localize "MIST_ECO.Bonuses.Max"}}</th>
+				<th class="name">{{localize "MIST_ECO.Bonuses.FromEffects"}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each bonuses}}
+			<tr>
+				<td class="name"><i class="{{icon}}" inert></i> {{label}}</td>
+				<td><input type="number" name="system.bonuses.{{key}}.value" value="{{value}}" step="1"></td>
+				<td><input type="number" name="system.bonuses.{{key}}.max" value="{{max}}" step="1"></td>
+				<td class="name mist-eco-effective">{{effects}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+
+	<div class="mist-eco-toolbar">
+		<span class="hint">{{localize (ifThen isCountry "MIST_ECO.Territory.DropRegion" "MIST_ECO.Territory.DropCity")}}</span>
+		{{#if isGM}}<button type="button" data-action="createChild"><i class="fa-solid fa-plus" inert></i> {{childLabel}}</button>{{/if}}
+	</div>
+
+	{{#if isCountry}}
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Territory.Regions"}} <span class="count">{{regions.length}}</span></h3>
+	{{#if regions.length}}
+	<table class="mist-eco-table">
+		<thead>
+			<tr>
+				<th class="name">{{localize "MIST_ECO.Territory.Region"}}</th>
+				<th data-tooltip="MIST_ECO.Territory.Cities"><i class="fa-solid fa-city" inert></i></th>
+				{{#each peopleLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
+				{{#each counterLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
+				<th data-tooltip="MIST_ECO.Territory.ActiveProjects"><i class="fa-solid fa-hammer" inert></i></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each regions}}
+			<tr data-uuid="{{uuid}}">
+				<td class="name"><a data-action="openLink"><img src="{{img}}" alt=""> {{name}}</a></td>
+				<td>{{cities}}</td>
+				<td>{{population}}</td>
+				<td>{{guards}}</td>
+				{{#each counters}}<td>{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
+				<td>{{active}}</td>
+				<td class="controls">{{#if @root.isGM}}<button type="button" class="icon fa-solid fa-link-slash" data-action="detachChild" data-tooltip="MIST_ECO.Territory.Detach"></button>{{/if}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+	{{else}}
+	<p class="hint">{{localize "MIST_ECO.Territory.NoRegions"}}</p>
+	{{/if}}
+	{{/if}}
+
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Territory.Cities"}} <span class="count">{{cities.length}}</span></h3>
+	{{#if cities.length}}
+	<table class="mist-eco-table mist-eco-cities">
+		<thead>
+			<tr>
+				<th class="name">{{localize "MIST_ECO.Territory.City"}}</th>
+				{{#if isCountry}}<th>{{localize "MIST_ECO.Territory.Region"}}</th>{{/if}}
+				{{#each peopleLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
+				{{#each counterLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
+				<th data-tooltip="MIST_ECO.Territory.ActiveProjects"><i class="fa-solid fa-hammer" inert></i></th>
+				<th class="alerts">{{localize "MIST_ECO.Territory.Alerts"}}</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each cities}}
+			<tr data-uuid="{{uuid}}" class="{{#if alerts}}alert{{/if}}">
+				<td class="name"><a data-action="openLink"><img src="{{img}}" alt=""> {{name}}</a></td>
+				{{#if @root.isCountry}}<td>{{region}}</td>{{/if}}
+				<td>{{population}}</td>
+				<td>{{guards}}</td>
+				{{#each counters}}<td>{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
+				<td>{{active}}</td>
+				<td class="alerts negative">{{alerts}}</td>
+				<td class="controls">{{#if @root.isGM}}{{#unless @root.isCountry}}<button type="button" class="icon fa-solid fa-link-slash" data-action="detachChild" data-tooltip="MIST_ECO.Territory.Detach"></button>{{/unless}}{{/if}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td class="name">{{localize "MIST_ECO.Territory.Total"}}</td>
+				{{#if isCountry}}<td></td>{{/if}}
+				<td>{{totals.population}}</td>
+				<td>{{totals.guards}}</td>
+				{{#each totals.counters}}<td>{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
+				<td>{{totals.active}}</td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tfoot>
+	</table>
+	{{else}}
+	<p class="hint">{{localize "MIST_ECO.Territory.NoCities"}}</p>
+	{{/if}}
+
+	<fieldset class="mist-eco-description">
+		<legend>{{localize "MIST_ECO.Overview.Description"}}</legend>
+		<prose-mirror name="system.description" value="{{system.description}}" toggled="true">{{{enrichedDescription}}}</prose-mirror>
+	</fieldset>
+</section>
