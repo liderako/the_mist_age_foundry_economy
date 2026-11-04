@@ -57,7 +57,7 @@
 			"path": "languages/ru.json"
 		}
 	],
-	"url": "",
-	"manifest": "",
+	"url": "https://github.com/liderako/the_mist_age_foundry_economy",
+	"manifest": "https://github.com/liderako/the_mist_age_foundry_economy/releases/latest/download/module.json",
 	"download": ""
 }
