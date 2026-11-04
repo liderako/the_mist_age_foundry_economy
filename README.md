@@ -68,3 +68,7 @@
 - `scripts/hierarchy.js` — связи страна → регион → город и счётчики города с бонусами региона и страны.
 - `scripts/days.js`, `scripts/time.js` — дни из игрового времени и отчёт.
 - `scripts/city-sheet.js`, `scripts/territory-sheet.js`, `scripts/project-config.js`, `scripts/features.js` — листы, редактор проекта, фичи и эффекты.
+
+## Лицензия
+
+[Apache License 2.0](LICENSE)
