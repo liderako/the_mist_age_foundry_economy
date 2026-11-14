@@ -19,7 +19,11 @@
 		<span data-tooltip="{{label}}"><i class="{{icon}}" inert></i> {{value}}</span>
 		{{/each}}
 		{{#each counters}}
-		<span data-tooltip="{{label}}"><i class="{{icon}}" inert></i> {{value}}/{{max}}</span>
+		{{#if need}}
+		<span data-tooltip="{{label}}: {{localize "MIST_ECO.Needs.Left" value=value need=need}}. {{about}}" class="{{#if short}}negative{{/if}}"><i class="{{icon}}" inert></i> {{available}}/{{max}}</span>
+		{{else}}
+		<span data-tooltip="{{label}} — {{about}}"><i class="{{icon}}" inert></i> {{value}}/{{max}}</span>
+		{{/if}}
 		{{/each}}
 	</div>
 	{{#if alerts}}<p class="mist-eco-alerts negative"><i class="fa-solid fa-triangle-exclamation" inert></i> {{alerts}}</p>{{/if}}

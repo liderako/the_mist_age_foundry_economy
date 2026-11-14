@@ -1,9 +1,11 @@
-import { CITY_TYPE, COSTS, COUNTERS, ICONS, MAX_BOXES, MODULE_ID, PEOPLE, PROJECT_STATUSES } from "./constants.js";
+import { CITY_TYPE, COSTS, COUNTERS, ICONS, MAX_BOXES, MODULE_ID, NEEDS, PEOPLE, PROJECT_STATUSES } from "./constants.js";
 import { advanceButton, alertText, askDays } from "./days.js";
 import { FEATURE_ACTIONS, featureGroup } from "./features.js";
 import { effectiveCounters, getCountry, getRegion, storedCounterValue } from "./hierarchy.js";
-import { getAlerts, getShortfalls, getWorkers, newGroup, startProject } from "./logic.js";
+import { getAlerts, getShortfalls, getWorkers, isBuilt, newGroup, startProject } from "./logic.js";
 import { ProjectConfig } from "./project-config.js";
+import { influenceRows } from "./influence.js";
+import { featureResources, resourceText } from "./resources.js";
 import { currentDate } from "./time.js";
 
 const { HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -18,31 +20,94 @@ export function signed(value) {
 	return value > 0 ? `+${value}` : value < 0 ? `${value}` : "";
 }
 
-/** A counter as the sheets draw it: boxes up to its maximum like a Daggerheart tracker, or a number when it is large. */
+/**
+ * A counter as the sheets draw it: boxes up to its maximum like a Daggerheart tracker, or a number when it is large.
+ * With a need, the first filled boxes are used by it, and the boxes it lacks are marked missing, past the maximum too.
+ */
 export function counterView(key, counter, extra = {}) {
+	const need = extra.need ?? 0;
+	const used = Math.min(need, counter.value);
+	const drawn = counter.max <= MAX_BOXES;
 	return {
 		key,
 		icon: ICONS[key],
 		label: localize(`Resources.${key}`),
+		// What the counter means, so stability and order are not mixed up.
+		about: localize(`Counters.About.${key}`),
 		value: counter.value,
 		max: counter.max,
-		boxes: counter.max <= MAX_BOXES ? Array.from({ length: counter.max }, (_, index) => ({ index: index + 1, filled: index < counter.value })) : null,
+		// What is left once the need has taken its share: 6 with a need of 5 shows as 1/6; a lack shows below zero.
+		available: counter.value - need,
+		used,
+		free: counter.value - used,
+		missing: Math.max(0, need - counter.value),
+		boxes: drawn ? Array.from({ length: counter.max }, (_, index) => ({
+			index: index + 1,
+			filled: index < counter.value,
+			used: index < used,
+			missing: index >= counter.value && index < need
+		})) : null,
+		// What the need lacks beyond the maximum, drawn as boxes that are not there.
+		beyond: drawn ? Array.from({ length: Math.max(0, need - Math.max(counter.max, counter.value)) }) : [],
 		...extra
 	};
 }
 
-/** A city's counters with what they are made of: its own maximum and what effects add. */
+/** A city's counters with what they are made of: its own maximum and what effects add; Supplies and Materials, with what the city needs. */
 function cityCounters(actor) {
 	const effective = effectiveCounters(actor);
 	const source = actor._source.system.counters;
+	const needs = actor.system.needs;
 	return COUNTERS.map(key => counterView(key, effective[key], {
 		baseMax: source[key].max,
-		bonusMax: signed(effective[key].max - source[key].max)
+		bonusMax: signed(effective[key].max - source[key].max),
+		...(NEEDS.includes(key) ? { need: needs[key], short: effective[key].value < needs[key] } : {}),
+		// Supplies are eaten by the people, and features add to or take from that.
+		...(key === "supplies" ? { needParts: localize("Needs.Parts", { people: actor.system.peopleNeed, features: signed(needs[key] - actor.system.peopleNeed) || "0" }) } : {})
 	}));
 }
 
+// Project sections and organization groups the user folded, kept between renders and sessions in this browser.
+const COLLAPSED_KEY = `${MODULE_ID}.collapsed`;
+const collapsed = new Set((() => {
+	try {
+		return JSON.parse(localStorage.getItem(COLLAPSED_KEY) ?? "[]");
+	} catch {
+		return [];
+	}
+})());
+
+function setCollapsed(key, folded) {
+	if (folded) {
+		collapsed.add(key);
+	} else {
+		collapsed.delete(key);
+	}
+	try {
+		localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...collapsed]));
+	} catch {
+		// Only remembered for this session.
+	}
+}
+
 /**
- * Sheet of a city: its people and counters (supplies, materials, stability, order, faith, power), which features raise
+ * Projects grouped by the organization behind them, by name; those of no organization last.
+ */
+function organizationGroups(projects) {
+	const groups = new Map();
+	for (const project of projects) {
+		const key = project.organizationName ? project.organization : "";
+		if (!groups.has(key)) {
+			const organization = key ? fromUuidSync(key, { strict: false }) : null;
+			groups.set(key, { uuid: key, name: organization?.name ?? localize("Organization.None"), img: organization?.img ?? "", projects: [] });
+		}
+		groups.get(key).projects.push(project);
+	}
+	return [...groups.values()].sort((a, b) => (!a.uuid - !b.uuid) || a.name.localeCompare(b.name, game.i18n.lang));
+}
+
+/**
+ * Sheet of a city: its people and counters (supplies, materials, stability, order, religious harmony, power), which features raise
  * and the GM moves like Daggerheart trackers; its projects; and its features and effects. Days pass with the world time
  * for the projects of every city at once.
  */
@@ -66,6 +131,7 @@ export class CitySheet extends HandlebarsApplicationMixin(foundry.applications.s
 			resumeProject: CitySheet.#onResumeProject,
 			unlockProject: CitySheet.#onUnlockProject,
 			reopenProject: CitySheet.#onReopenProject,
+			buildProject: CitySheet.#onBuildProject,
 			copyProject: CitySheet.#onCopyProject,
 			addGroup: CitySheet.#onAddGroup,
 			deleteGroup: CitySheet.#onDeleteGroup,
@@ -78,6 +144,7 @@ export class CitySheet extends HandlebarsApplicationMixin(foundry.applications.s
 		tabs: { template: "templates/generic/tab-navigation.hbs" },
 		overview: { template: `${TEMPLATES}/city-overview.hbs`, scrollable: [""] },
 		projects: { template: `${TEMPLATES}/city-projects.hbs`, scrollable: [""] },
+		organizations: { template: `${TEMPLATES}/city-organizations.hbs`, scrollable: [""] },
 		features: { template: `${TEMPLATES}/features.hbs`, scrollable: [""] },
 		effects: { template: `${TEMPLATES}/effects.hbs`, scrollable: [""] }
 	};
@@ -87,6 +154,7 @@ export class CitySheet extends HandlebarsApplicationMixin(foundry.applications.s
 			tabs: [
 				{ id: "overview", icon: "fa-solid fa-city" },
 				{ id: "projects", icon: "fa-solid fa-hammer" },
+				{ id: "organizations", icon: "fa-solid fa-landmark-flag" },
 				{ id: "features", icon: "fa-solid fa-star" },
 				{ id: "effects", icon: "fa-solid fa-wand-magic-sparkles" }
 			],
@@ -123,12 +191,22 @@ export class CitySheet extends HandlebarsApplicationMixin(foundry.applications.s
 			people: PEOPLE.map(key => ({ key, icon: ICONS[key], label: localize(`Resources.${key}`), value: system[key] })),
 			groups: system.groups.map(group => ({ ...group, icon: ICONS[group.guard ? "guards" : "population"] })),
 			workers: { ...getWorkers(system), short: getWorkers(system).free < 0 },
-			alerts: alertText(getAlerts({ groups: system.groups, projects: system.projects, counters: effectiveCounters(actor) })),
+			alerts: alertText(getAlerts({ groups: system.groups, projects: system.projects, needs: system.needs, counters: effectiveCounters(actor) })),
 			sections: PROJECT_STATUSES.filter(status => isGM || status !== "locked").map(status => ({
 				status,
 				label: localize(`Status.${status}`),
 				projects: views.filter(project => project.status === status)
-			})).filter(section => section.projects.length || ["active", "available"].includes(section.status)),
+			})).filter(section => section.projects.length || ["active", "available"].includes(section.status))
+				.map(section => {
+					const key = `${actor.id}.${section.status}`;
+					return {
+						...section,
+						collapseKey: key,
+						open: !collapsed.has(key),
+						groups: organizationGroups(section.projects).map(group => ({ ...group, collapseKey: `${key}.${group.uuid || "none"}`, open: !collapsed.has(`${key}.${group.uuid || "none"}`) }))
+					};
+				}),
+			influence: influenceRows([actor]),
 			featureGroups: [await featureGroup(actor, { editable: this.isEditable })],
 			enrichedDescription: await enrich(system.description)
 		});
@@ -156,6 +234,9 @@ export class CitySheet extends HandlebarsApplicationMixin(foundry.applications.s
 
 	async _onRender(context, options) {
 		await super._onRender(context, options);
+		for (const details of this.element.querySelectorAll("details[data-collapse]")) {
+			details.addEventListener("toggle", () => setCollapsed(details.dataset.collapse, !details.open));
+		}
 		if (!this.isEditable) {
 			for (const input of this.element.querySelectorAll("input, select, textarea, prose-mirror, button[data-action$='Counter']")) {
 				input.disabled = true;
@@ -163,26 +244,35 @@ export class CitySheet extends HandlebarsApplicationMixin(foundry.applications.s
 		}
 	}
 
+	/** A project as the sheet lists it; each feature it gives shows what that feature gives and needs. */
 	#projectView(project, projectName) {
 		const label = key => localize(`Resources.${key}`);
-		const rewards = project.rewards.map(reward => {
-			const amount = reward.mode === "range" ? `${reward.min}–${reward.max}` : `${reward.amount}`;
-			const chance = reward.chance < 1 ? ` (${Math.round(reward.chance * 100)}%)` : "";
-			return `+${amount} ${label(reward.target)}${chance}`;
-		});
+		const grantText = grant => {
+			const resources = resourceText(featureResources(grant.uuid ? fromUuidSync(grant.uuid, { strict: false }) : null));
+			const where = grant.target === "city" ? "" : localize(`Features.Target.${grant.target}`);
+			const details = [where, resources].filter(Boolean).join("; ");
+			return details ? `${grant.name} (${details})` : grant.name;
+		};
+		const organization = project.organization ? fromUuidSync(project.organization, { strict: false }) : null;
 		return {
 			...project,
-			ongoing: project.days === 0,
+			// A project whose organization was deleted shows none.
+			organizationName: organization?.name ?? "",
+			allyNames: (project.allies ?? []).map(uuid => fromUuidSync(uuid, { strict: false })).filter(Boolean).map(ally => ({ uuid: ally.uuid, name: ally.name })),
+			kindLabel: localize(`Project.Kind.${project.kind}`),
+			working: isBuilt(project),
+			grantsLabel: localize(project.kind === "once" ? "Features.Leaves" : "Features.Holds"),
 			percent: project.days ? Math.min(100, Math.round(project.progress / project.days * 100)) : 0,
 			cost: Object.entries(project.cost).filter(([, amount]) => amount).map(([key, amount]) => `${amount} ${label(key)}`).join(", "),
-			rewards: rewards.join(", "),
 			unlocks: project.unlocks.map(projectName).filter(Boolean).join(", "),
-			grants: project.grants.map(grant => (grant.target === "city" ? grant.name : `${grant.name} (${localize(`Features.Target.${grant.target}`)})`)).join(", "),
+			grants: project.grants.map(grantText).join(", "),
 			canStart: project.status === "available",
 			canPause: project.status === "active",
 			canResume: project.status === "paused",
 			canUnlock: project.status === "locked",
-			canReopen: project.status === "completed"
+			canReopen: project.status === "completed",
+			// The GM can set a lasting project up as already built, so a world starts with what it already has.
+			canBuild: game.user.isGM && !isBuilt(project) && ["available", "active", "paused"].includes(project.status)
 		};
 	}
 
@@ -297,6 +387,12 @@ export class CitySheet extends HandlebarsApplicationMixin(foundry.applications.s
 
 	static async #onReopenProject(event, target) {
 		await this.#updateProject(this.#project(target).id, { status: "available", progress: 0 });
+	}
+
+	/** Sets a lasting project up as built and running, without paying its cost or waiting its days. */
+	static async #onBuildProject(event, target) {
+		const project = this.#project(target);
+		await this.#updateProject(project.id, { status: "active", progress: project.days });
 	}
 
 	static async #onAddGroup(event, target) {

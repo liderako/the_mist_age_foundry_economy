@@ -45,6 +45,7 @@
 		{{/if}}
 	</div>
 	{{/each}}
+	{{#unless isOrganization}}
 	<details class="mist-eco-effect-keys" open>
 		<summary>{{localize "MIST_ECO.Effects.KeysTitle"}}</summary>
 		<p class="hint">{{localize "MIST_ECO.Effects.KeysHint"}}</p>
@@ -52,11 +53,13 @@
 			{{#if isCity}}
 			<li><code>system.counters.supplies.max</code> — {{localize "MIST_ECO.Effects.Keys.max"}}</li>
 			<li><code>system.counters.supplies.value</code> — {{localize "MIST_ECO.Effects.Keys.value"}}</li>
+			<li><code>system.needs.materials</code> — {{localize "MIST_ECO.Effects.Keys.needs"}}</li>
 			{{else}}
 			<li><code>system.bonuses.supplies.max</code> — {{localize "MIST_ECO.Effects.Keys.bonusMax"}}</li>
 			<li><code>system.bonuses.supplies.value</code> — {{localize "MIST_ECO.Effects.Keys.bonusValue"}}</li>
 			{{/if}}
-			<li>{{localize "MIST_ECO.Effects.Keys.counters"}} <code>supplies</code> · <code>materials</code> · <code>stability</code> · <code>order</code> · <code>faith</code> · <code>power</code></li>
+			<li>{{localize "MIST_ECO.Effects.Keys.counters"}} <code>supplies</code> · <code>materials</code> · <code>stability</code> · <code>order</code> · <code>faith</code> · <code>satisfaction</code> · <code>power</code></li>
 		</ul>
 	</details>
+	{{/unless}}
 </section>

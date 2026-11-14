@@ -1,0 +1,83 @@
+<section class="tab mist-eco-overview {{tab.cssClass}}" data-tab="overview" data-group="primary">
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Organization.Members"}} <span class="count">{{members.length}}</span></h3>
+	<p class="hint">{{localize "MIST_ECO.Organization.MembersHint"}}</p>
+	{{#if members.length}}
+	<table class="mist-eco-table mist-eco-influence">
+		<tbody>
+			{{#each members}}
+			<tr data-uuid="{{uuid}}">
+				<td class="name"><a data-action="openLink"><img src="{{img}}" alt=""> {{name}}</a></td>
+				<td class="name">{{kind}}</td>
+				<td class="controls">{{#if @root.editable}}<button type="button" class="icon fa-solid fa-link-slash" data-action="detachMember" data-tooltip="MIST_ECO.Organization.Detach"></button>{{/if}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+	{{/if}}
+
+	{{#each areas}}
+	{{#if rows.length}}
+	<h3 class="mist-eco-section">{{title}} <span class="count">{{rows.length}}</span></h3>
+	<table class="mist-eco-table mist-eco-influence">
+		<thead>
+			<tr>
+				<th class="name"></th>
+				<th data-tooltip="MIST_ECO.Influence.CitiesHint"><i class="fa-solid fa-city" inert></i></th>
+				<th data-tooltip="MIST_ECO.Influence.RunningHint">{{localize "MIST_ECO.Influence.Running"}}</th>
+				<th data-tooltip="MIST_ECO.Influence.BuildingHint">{{localize "MIST_ECO.Influence.Building"}}</th>
+				<th class="name">{{localize "MIST_ECO.Influence.Share"}}</th>
+				<th>{{localize "MIST_ECO.Influence.LevelLabel"}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each rows}}
+			<tr data-uuid="{{uuid}}">
+				<td class="name"><a data-action="openLink"><img src="{{img}}" alt=""> {{name}}</a></td>
+				<td>{{cities}}</td>
+				<td>{{projects}} / {{total}}{{#if modifier}} <span class="hint" data-tooltip="MIST_ECO.Influence.ModifierHint">({{modifier}})</span>{{/if}}</td>
+				<td>{{building}}</td>
+				<td class="name"><div class="mist-eco-bar"><span style="width: {{percent}}%"></span></div> {{percent}}%</td>
+				<td class="mist-eco-influence-level level-{{level}}">{{levelLabel}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+	{{/if}}
+	{{/each}}
+
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Influence.Cities"}} <span class="count">{{cities.length}}</span></h3>
+	<p class="hint">{{localize "MIST_ECO.Influence.OrganizationHint"}}</p>
+	{{#if cities.length}}
+	<table class="mist-eco-table mist-eco-influence">
+		<thead>
+			<tr>
+				<th class="name">{{localize "MIST_ECO.Influence.City"}}</th>
+				<th data-tooltip="MIST_ECO.Influence.RunningHint">{{localize "MIST_ECO.Influence.Running"}}</th>
+				<th data-tooltip="MIST_ECO.Influence.BuildingHint">{{localize "MIST_ECO.Influence.Building"}}</th>
+				<th class="name">{{localize "MIST_ECO.Influence.Share"}}</th>
+				<th>{{localize "MIST_ECO.Influence.LevelLabel"}}</th>
+				<th class="name">{{localize "MIST_ECO.Influence.Projects"}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each cities}}
+			<tr data-uuid="{{uuid}}">
+				<td class="name"><a data-action="openLink"><img src="{{img}}" alt=""> {{name}}</a>{{#if place}}<br><span class="hint">{{place}}</span>{{/if}}</td>
+				<td>{{projects}} / {{total}}{{#if modifier}} <span class="hint" data-tooltip="MIST_ECO.Influence.ModifierHint">({{modifier}})</span>{{/if}}</td>
+				<td>{{building}}</td>
+				<td class="name"><div class="mist-eco-bar"><span style="width: {{percent}}%"></span></div> {{percent}}%</td>
+				<td class="mist-eco-influence-level level-{{level}}">{{levelLabel}}</td>
+				<td class="name">{{#each projectList}}<span class="{{#unless running}}hint{{/unless}}">{{name}}{{#if by}} — {{by}}{{/if}}{{#unless running}} ({{status}}){{/unless}}</span>{{#unless @last}}, {{/unless}}{{/each}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+	{{else}}
+	<p class="hint">{{localize "MIST_ECO.Influence.NoCities"}}</p>
+	{{/if}}
+
+	<fieldset class="mist-eco-description">
+		<legend>{{localize "MIST_ECO.Overview.Description"}}</legend>
+		<prose-mirror name="system.description" value="{{system.description}}" toggled="true">{{{enrichedDescription}}}</prose-mirror>
+	</fieldset>
+</section>

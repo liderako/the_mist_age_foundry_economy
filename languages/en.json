@@ -4,7 +4,8 @@
 			"mist-age-economy": {
 				"city": "City",
 				"region": "Region",
-				"country": "Country"
+				"country": "Country",
+				"organization": "Organization"
 			}
 		}
 	},
@@ -29,21 +30,27 @@
 			"Status": "Status",
 			"Work": "Work",
 			"Days": "Days per cycle",
-			"DaysHint": "0 for a project that just keeps going, such as a workshop in use; it gives its rewards every day.",
+			"DaysHint": "How many days the project is built. A lasting one with 0 runs at once.",
 			"Progress": "Days worked",
-			"Repeat": "Repeats",
-			"RepeatHint": "After its days the project gives its rewards and starts over instead of being completed.",
+			"KindLabel": "Kind",
+			"KindsHint": "A project only gives features; the features give the resources. One-time: built, then completed, leaving its features for good. Lasting: built, then runs, holding its features while switched on; switched off, they go, switched on again, they come back without new building.",
+			"Kind": {
+				"once": "One-time",
+				"lasting": "Lasting"
+			},
+			"KindHint": {
+				"once": "Built, then completed, leaving its features for good.",
+				"lasting": "Built, then runs: holds its features while switched on."
+			},
+			"Working": "Running",
+			"Build": "Already built: done at once, no building and no cost",
 			"Workers": "Residents at work",
 			"Cost": "Cost",
 			"CostHint": "Paid once, when the project starts.",
-			"Rewards": "Rewards",
-			"RewardsHint": "Given each time the project finishes its days. A reward to a group adds people to it.",
 			"Unlocks": "Unlocks",
 			"UnlocksHint": "Locked projects that become available when this one is completed.",
 			"Description": "Description",
 			"None": "No projects.",
-			"Repeats": "Repeats",
-			"Ongoing": "Ongoing",
 			"DaysOf": "{progress} / {days} days",
 			"Unnamed": "({count} of them not named yet; choose who with the workers button)",
 			"Start": "Start",
@@ -65,20 +72,6 @@
 			"Needs": "{count} needed",
 			"NoCities": "There is no other city."
 		},
-		"Reward": {
-			"Fixed": "Fixed",
-			"Range": "Range",
-			"Amount": "Amount",
-			"From": "From",
-			"To": "To",
-			"Whole": "Whole",
-			"WholeHint": "Rolls a whole number from From to To, for things counted one by one.",
-			"Chance": "Chance",
-			"ChanceHint": "How often the reward comes: 100% always, 50% every other time on average.",
-			"Remove": "Remove reward",
-			"Add": "Add reward",
-			"NewGroup": "(new in this base)"
-		},
 		"Features": {
 			"Hint": "Features work like an adversary's: Daggerheart feature items with a description and their own effects. A region's or country's features reach every city inside.",
 			"New": "New feature",
@@ -92,18 +85,25 @@
 			"SourceHint": "A project, an event, a deal…",
 			"From": "from {source}",
 			"None": "No features yet.",
-			"Grants": "Features on completion",
-			"GrantsHint": "When this project is completed (not each cycle of a repeating one), these features are added to its base or to the headquarters. Drag a feature item here to grant a copy of it, effects included; or name a plain one. A base without a headquarters keeps both.",
+			"Grants": "Features",
+			"GrantsHint": "What the project gives. A one-time one leaves them when completed; a lasting one holds them while it runs. Each feature has its own resources: they are written into the feature itself (its effect is named after them), so the feature's sheet shows them and can change them. Drop a feature item here or add a new one; it appears in the Items folder when saved. A feature for a region or country gives its resources to every city inside (as a bonus); it has no needs.",
 			"AddGrant": "Add a feature",
 			"DescriptionHint": "What it gives; each line becomes a paragraph",
 			"Leaves": "Leaves",
+			"Holds": "Gives while running",
 			"LinkedHint": "When the project completes, a copy of this item is added, with its effects.",
 			"Unlink": "Make a plain feature",
 			"Target": {
 				"city": "This city",
 				"region": "Region",
 				"country": "Country"
-			}
+			},
+			"Gives": "Gives:",
+			"Needs": "Needs:",
+			"AddGives": "Resource",
+			"AddNeeds": "Need",
+			"RemoveResource": "Remove",
+			"ReadOnly": "This feature is from a compendium or another actor: its resources are only shown here."
 		},
 		"Effects": {
 			"Title": "Effects",
@@ -120,6 +120,7 @@
 			"Keys": {
 				"max": "maximum of a counter (Add 3: three plantations)",
 				"value": "value of a counter",
+				"needs": "what the city needs of any resource (Add 1: fishers need 1 Materials)",
 				"bonusMax": "maximum of a counter in every city inside",
 				"bonusValue": "value of a counter in every city inside",
 				"counters": "Counters:"
@@ -127,7 +128,7 @@
 		},
 		"Days": {
 			"Next": "Next day",
-			"NextHint": "Moves the world time one day forward. Projects work and everyone eats.",
+			"NextHint": "The economy's next day for every city: projects move on. The calendar and the world time stay as they are.",
 			"Pass": "Pass",
 			"PassHint": "Let several days pass",
 			"PassTitle": "Let days pass",
@@ -137,30 +138,104 @@
 		"Sheets": {
 			"city": "City Sheet",
 			"region": "Region Sheet",
-			"country": "Country Sheet"
+			"country": "Country Sheet",
+			"organization": "Organization sheet"
 		},
 		"Tabs": {
 			"overview": "Overview",
 			"projects": "Projects",
 			"features": "Features",
-			"effects": "Effects"
+			"effects": "Effects",
+			"organizations": "Organizations"
 		},
 		"Resources": {
 			"supplies": "Supplies",
 			"materials": "Materials",
 			"stability": "Stability",
 			"order": "Order",
-			"faith": "Faith",
+			"faith": "Religious Harmony",
+			"satisfaction": "Satisfaction",
 			"power": "Power",
 			"population": "Population",
-			"guards": "Guards"
+			"guards": "Guards",
+			"NeedsText": "needs {needs}",
+			"None": "No resources"
 		},
 		"Counters": {
 			"Title": "Counters",
 			"Hint": "Each counter is a tracker like in Daggerheart: features raise its maximum (three plantations around the city: Supplies max +3), the GM moves its value. Click a box to set it; click the last filled box to clear it.",
 			"BaseMax": "Own maximum",
 			"BonusHint": "Added by effects of the city, its region and its country",
-			"NoMax": "No maximum yet: give the city a feature or set its own maximum."
+			"NoMax": "No maximum yet: give the city a feature or set its own maximum.",
+			"About": {
+				"supplies": "Food and all the city lives on. The people consume 1 level for every thousand; fishers, hunters and trade give it.",
+				"materials": "Wood, stone, metal. Spent on building and upkeep: guards and garrisons consume them.",
+				"stability": "How well the city holds together: trust in its rulers, no riots or plots. The lasting strength of its society — it falls with hunger, church feuds, corruption; force cannot restore it in a day.",
+				"order": "The law on the streets right now: patrols, guards, little crime. Order can be held by force even in an unstable city — and it is the first to fall when the guards leave.",
+				"faith": "Peace between the faiths of the city: how well its churches and cults live together.",
+				"satisfaction": "How content the people are: plenty, entertainment, freedoms. A content city endures more.",
+				"power": "The city's military might: guards, legions, mercenaries — who can defend the city or keep it down."
+			}
+		},
+		"Needs": {
+			"Hint": {
+				"supplies": "The people need one level of Supplies for every thousand residents and guards (a started thousand counts), plus what features add (system.needs.supplies). With less, the city gets the Supply Shortage feature.",
+				"materials": "What the city's features need (system.needs.materials): fishers need 1 Materials, which another project has to give. With less, the city gets the Materials Shortage feature.",
+				"stability": "What the city's features need (system.needs.stability): other features have to meet it. With less, the city gets the Stability Shortage feature.",
+				"order": "What the city's features need (system.needs.order): other features have to meet it. With less, the city gets the Order Shortage feature.",
+				"faith": "What the city's features need (system.needs.faith): other features have to meet it. With less, the city gets the Religious Harmony Shortage feature.",
+				"satisfaction": "What the city's features need (system.needs.satisfaction): other features have to meet it. With less, the city gets the Satisfaction Shortage feature.",
+				"power": "What the city's features need (system.needs.power): other features have to meet it. With less, the city gets the Power Shortage feature."
+			},
+			"Used": "Needed {need}: {need} used, {free} free",
+			"Short": "Needed {need}: {missing} missing",
+			"Parts": "People eat {people}, features {features}",
+			"UsedBox": "Used by a need: features and people consume it",
+			"MissingBox": "Missing: the need is more than there is",
+			"BeyondBox": "Missing: the need is more than even the maximum",
+			"Left": "{value} there, {need} needed"
+		},
+		"Shortage": {
+			"Name": {
+				"supplies": "Supply Shortage",
+				"materials": "Materials Shortage",
+				"stability": "Stability Shortage",
+				"order": "Order Shortage",
+				"faith": "Religious Harmony Shortage",
+				"satisfaction": "Satisfaction Shortage",
+				"power": "Power Shortage"
+			},
+			"Description": {
+				"supplies": "The city has less Supplies than it needs: its people need one level for every thousand, and its features may need more. The feature goes away by itself once there are enough.",
+				"materials": "The city has less Materials than its features need. The feature goes away by itself once there are enough.",
+				"stability": "The city has less Stability than its features need. The feature goes away by itself once there is enough.",
+				"order": "The city has less Order than its features need. The feature goes away by itself once there is enough.",
+				"faith": "The city has less Religious Harmony than its features need. The feature goes away by itself once there is enough.",
+				"satisfaction": "The city has less Satisfaction than its features need. The feature goes away by itself once there is enough.",
+				"power": "The city has less Power than its features need. The feature goes away by itself once there is enough."
+			}
+		},
+		"Settings": {
+			"ShortageFeature": {
+				"Name": {
+					"supplies": "Supply shortage feature",
+					"materials": "Materials shortage feature",
+					"stability": "Stability shortage feature",
+					"order": "Order shortage feature",
+					"faith": "Religious Harmony shortage feature",
+					"satisfaction": "Satisfaction shortage feature",
+					"power": "Power shortage feature"
+				},
+				"Hint": {
+					"supplies": "UUID of a Daggerheart feature item a city gets while it has less Supplies than it needs. Empty: a built-in feature that lowers Stability by 1.",
+					"materials": "UUID of a Daggerheart feature item a city gets while it has less Materials than it needs. Empty: a built-in feature that lowers Stability by 1.",
+					"stability": "UUID of a Daggerheart feature item a city gets while it has less Stability than it needs. Empty: a built-in feature that lowers Stability by 1.",
+					"order": "UUID of a Daggerheart feature item a city gets while it has less Order than it needs. Empty: a built-in feature that lowers Stability by 1.",
+					"faith": "UUID of a Daggerheart feature item a city gets while it has less Religious Harmony than it needs. Empty: a built-in feature that lowers Stability by 1.",
+					"satisfaction": "UUID of a Daggerheart feature item a city gets while it has less Satisfaction than it needs. Empty: a built-in feature that lowers Stability by 1.",
+					"power": "UUID of a Daggerheart feature item a city gets while it has less Power than it needs. Empty: a built-in feature that lowers Stability by 1."
+				}
+			}
 		},
 		"Groups": {
 			"Title": "People",
@@ -199,17 +274,26 @@
 		},
 		"Alerts": {
 			"workers": "more work than free residents",
+			"short": {
+				"supplies": "less Supplies than needed",
+				"materials": "less Materials than needed",
+				"stability": "less Stability than needed",
+				"order": "less Order than needed",
+				"faith": "less Religious Harmony than needed",
+				"satisfaction": "less Satisfaction than needed",
+				"power": "less Power than needed"
+			},
 			"stability": "stability at zero",
 			"order": "order at zero"
 		},
 		"Report": {
+			"Now": "Projects done at once",
 			"Speaker": "Economy",
 			"Days": "{days} day(s) passed",
-			"Yields": "Projects brought:",
 			"Completed": "Completed:",
+			"Built": "Built and running:",
 			"Unlocked": "Now available:",
-			"Features": "New features:",
-			"Lost": "No room for: {lost}."
+			"Features": "New features:"
 		},
 		"Territory": {
 			"NoCountry": "No country",
@@ -230,6 +314,87 @@
 			"ActiveProjects": "Active projects",
 			"Detach": "Remove",
 			"DetachConfirm": "Remove {name} from {parent}? It keeps everything it has."
+		},
+		"Organization": {
+			"Allies": "Also strengthens",
+			"AlliesHint": "Organizations the project also gives its influence to in the city: temple knights who serve a noble house. Ctrl+click to pick several.",
+			"Label": "Organization",
+			"None": "— no organization —",
+			"Missing": "(deleted organization)",
+			"ProjectHint": "Whose project it is: a guild, house, syndicate. Running projects give the organization influence on the city.",
+			"Kind": "What it is",
+			"KindHint": "guild, noble house, syndicate…",
+			"Kinds": {
+				"guild": "Guild",
+				"house": "Noble house",
+				"syndicate": "Syndicate",
+				"church": "Church",
+				"company": "Trading company",
+				"order": "Order"
+			},
+			"Parent": "Part of",
+			"ParentNone": "— independent —",
+			"ParentHint": "The organization it is part of: a legion is part of the Crown. Its projects count for that organization's influence too.",
+			"PartOf": "part of {name}",
+			"Members": "Part of it",
+			"MembersHint": "Projects of these organizations (and of those part of them) count for this one's influence too. Drop an organization on the sheet to make it part of this one; 🔗 detaches it.",
+			"Detach": "Detach",
+			"Cycle": "{name} cannot become part of {parent}: {parent} is part of {name}."
+		},
+		"EffectKeys": {
+			"OrganizationGroup": "Economy: this organization",
+			"OwnInfluence": "Influence of this organization in all its cities",
+			"OwnInfluenceHint": "An effect on the organization's sheet: Add N adds to its influence in every city where it has running projects (−1 weakens it everywhere).",
+			"InfluenceGroup": "Economy: influence of organizations in the city",
+			"InfluenceOf": "Influence: {name}",
+			"InfluenceKeyHint": "Adds to the organization's influence in this city (−1 weakens it). Works on effects of the city and its features.",
+			"City": "Economy: city",
+			"Area": "Economy: region or country (every city)",
+			"Value": "{name}: value",
+			"Max": "{name}: maximum",
+			"ValueHint": "Moves the city's counter value. A resource a feature gives moves both the value and the maximum.",
+			"MaxHint": "Raises or lowers the city's counter maximum.",
+			"Need": "Need: {name}",
+			"NeedHint": "How much of the resource the city needs. A negative number lowers the need (slaves eat less).",
+			"BonusValue": "Every city — {name}: value",
+			"BonusMax": "Every city — {name}: maximum",
+			"BonusHint": "An effect of a region or country: added to the counter of every city inside.",
+			"Influence": "Influence of organizations",
+			"InfluenceHint": "What the effect adds to an organization's influence in the city (−1 weakens it). Works on effects of the city and its features.",
+			"AddInfluence": "Add organization",
+			"RemoveInfluence": "Remove"
+		},
+		"Influence": {
+			"Title": "Influence of organizations",
+			"CityHint": "Influence is an organization's share of the city's running projects (built lasting ones and completed one-time ones). Those still being built are shown apart and give no influence yet.",
+			"OrganizationHint": "Cities where the organization has projects, and its influence on each: its share of the city's running projects.",
+			"Cities": "Cities",
+			"City": "City",
+			"Projects": "Its projects",
+			"Running": "Running",
+			"Weight": "Influence weight",
+			"WeightHint": "How much influence the project gives its organization in the city: a fleet weighs more than a tavern. 0 gives none.",
+			"RunningHint": "Influence of its running projects / of all running projects of the city (each weighs its influence weight, usually 1)",
+			"Building": "Building",
+			"BuildingHint": "Its projects still being built: no influence yet",
+			"StrongHint": "Cities where its influence is strong or dominant",
+			"Share": "Share",
+			"LevelLabel": "Influence",
+			"Level": {
+				"none": "None",
+				"minor": "Minor",
+				"notable": "Notable",
+				"strong": "Strong",
+				"dominant": "Dominant"
+			},
+			"NoneInCity": "No project of the city names an organization. An organization is chosen in the project editor.",
+			"NoCities": "No project in any city names this organization. Choose it in a city's project editor.",
+			"Countries": "Countries",
+			"Regions": "Regions",
+			"CitiesHint": "In how many cities it has projects",
+			"AreaHint": "Influence on a whole region or country is the organization's share of the running projects of all its cities. Those still being built are shown apart and give no influence yet.",
+			"NoneInArea": "No project of the cities here names an organization.",
+			"ModifierHint": "Modifier from effects in the city: added to its running projects (never below none)."
 		}
 	}
 }

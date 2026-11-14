@@ -12,6 +12,31 @@
 		</div>
 	</div>
 	<div class="form-group">
+		<label>{{localize "MIST_ECO.Organization.Label"}}</label>
+		<div class="form-fields">
+			<select name="organization">
+				{{#each organizations}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+			</select>
+		</div>
+		<p class="hint">{{localize "MIST_ECO.Organization.ProjectHint"}}</p>
+	</div>
+	<div class="form-group">
+		<label>{{localize "MIST_ECO.Organization.Allies"}}</label>
+		<div class="form-fields">
+			<select name="allies" multiple size="5">
+				{{#each allies}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+			</select>
+		</div>
+		<p class="hint">{{localize "MIST_ECO.Organization.AlliesHint"}}</p>
+	</div>
+	<div class="form-group">
+		<label>{{localize "MIST_ECO.Influence.Weight"}}</label>
+		<div class="form-fields">
+			<input type="number" name="influence" value="{{project.influence}}" min="0" step="1">
+		</div>
+		<p class="hint">{{localize "MIST_ECO.Influence.WeightHint"}}</p>
+	</div>
+	<div class="form-group">
 		<label>{{localize "MIST_ECO.Project.Status"}}</label>
 		<div class="form-fields">
 			<select name="status">
@@ -36,11 +61,13 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label>{{localize "MIST_ECO.Project.Repeat"}}</label>
+			<label>{{localize "MIST_ECO.Project.KindLabel"}}</label>
 			<div class="form-fields">
-				<input type="checkbox" name="repeat" {{#if project.repeat}}checked{{/if}}>
+				<select name="kind">
+					{{#each kinds}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+				</select>
 			</div>
-			<p class="hint">{{localize "MIST_ECO.Project.RepeatHint"}}</p>
+			<p class="hint">{{localize "MIST_ECO.Project.KindsHint"}}</p>
 		</div>
 		<div class="form-group">
 			<label>{{localize "MIST_ECO.Project.Workers"}}</label>
@@ -61,29 +88,6 @@
 			</div>
 		</div>
 		{{/each}}
-	</fieldset>
-
-	<fieldset>
-		<legend>{{localize "MIST_ECO.Project.Rewards"}}</legend>
-		<p class="hint">{{localize "MIST_ECO.Project.RewardsHint"}}</p>
-		{{#each rewards}}
-		<div class="mist-eco-reward" data-mode="{{mode}}">
-			<select name="rewards.{{index}}.target">
-				{{#each targets}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-			</select>
-			<select name="rewards.{{index}}.mode" data-reward-mode>
-				<option value="fixed" {{#if (eq mode "fixed")}}selected{{/if}}>{{localize "MIST_ECO.Reward.Fixed"}}</option>
-				<option value="range" {{#if (eq mode "range")}}selected{{/if}}>{{localize "MIST_ECO.Reward.Range"}}</option>
-			</select>
-			<label class="fixed">{{localize "MIST_ECO.Reward.Amount"}} <input type="number" name="rewards.{{index}}.amount" value="{{amount}}" step="1"></label>
-			<label class="range">{{localize "MIST_ECO.Reward.From"}} <input type="number" name="rewards.{{index}}.min" value="{{min}}" step="1"></label>
-			<label class="range">{{localize "MIST_ECO.Reward.To"}} <input type="number" name="rewards.{{index}}.max" value="{{max}}" step="1"></label>
-			<label class="range" data-tooltip="MIST_ECO.Reward.WholeHint"><input type="checkbox" name="rewards.{{index}}.whole" {{#if whole}}checked{{/if}}> {{localize "MIST_ECO.Reward.Whole"}}</label>
-			<label data-tooltip="MIST_ECO.Reward.ChanceHint">{{localize "MIST_ECO.Reward.Chance"}} <input type="number" name="rewards.{{index}}.chance" value="{{chancePercent}}" min="0" max="100" step="1">%</label>
-			<button type="button" class="icon fa-solid fa-trash" data-action="removeReward" data-index="{{index}}" data-tooltip="MIST_ECO.Reward.Remove"></button>
-		</div>
-		{{/each}}
-		<button type="button" data-action="addReward"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Reward.Add"}}</button>
 	</fieldset>
 
 	<fieldset class="mist-eco-grants">
@@ -108,6 +112,31 @@
 			{{else}}
 			<textarea name="grants.{{index}}.description" rows="2" placeholder="{{localize "MIST_ECO.Features.DescriptionHint"}}">{{description}}</textarea>
 			{{/if}}
+			<div class="mist-eco-grant-resources">
+				{{#unless editable}}<p class="hint">{{localize "MIST_ECO.Features.ReadOnly"}}</p>{{/unless}}
+				<span class="label">{{localize "MIST_ECO.Features.Gives"}}</span>
+				{{#each gives}}
+				<span class="mist-eco-resource-row">
+					<select name="grants.{{../index}}.gives.{{index}}.key" {{#unless ../editable}}disabled{{/unless}}>
+						{{#each keys}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+					</select>
+					<input type="number" name="grants.{{../index}}.gives.{{index}}.amount" value="{{amount}}" step="1" {{#unless ../editable}}disabled{{/unless}}>
+					{{#if ../editable}}<button type="button" class="icon fa-solid fa-xmark" data-action="removeResource" data-index="{{../index}}" data-list="gives" data-row="{{index}}" data-tooltip="MIST_ECO.Features.RemoveResource"></button>{{/if}}
+				</span>
+				{{/each}}
+				{{#if editable}}<button type="button" data-action="addResource" data-index="{{index}}" data-list="gives"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Features.AddGives"}}</button>{{/if}}
+				<span class="label">{{localize "MIST_ECO.Features.Needs"}}</span>
+				{{#each needs}}
+				<span class="mist-eco-resource-row">
+					<select name="grants.{{../index}}.needs.{{index}}.key" {{#unless ../editable}}disabled{{/unless}}>
+						{{#each keys}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+					</select>
+					<input type="number" name="grants.{{../index}}.needs.{{index}}.amount" value="{{amount}}" min="0" step="1" {{#unless ../editable}}disabled{{/unless}}>
+					{{#if ../editable}}<button type="button" class="icon fa-solid fa-xmark" data-action="removeResource" data-index="{{../index}}" data-list="needs" data-row="{{index}}" data-tooltip="MIST_ECO.Features.RemoveResource"></button>{{/if}}
+				</span>
+				{{/each}}
+				{{#if editable}}<button type="button" data-action="addResource" data-index="{{index}}" data-list="needs"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Features.AddNeeds"}}</button>{{/if}}
+			</div>
 		</div>
 		{{/each}}
 		<button type="button" data-action="addGrant"><i class="fa-solid fa-plus" inert></i> {{localize "MIST_ECO.Features.AddGrant"}}</button>

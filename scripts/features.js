@@ -1,8 +1,10 @@
 import { MODULE_ID } from "./constants.js";
 import { textToHtml } from "./logic.js";
+import { featureResources, resourceText } from "./resources.js";
 
 const { DialogV2 } = foundry.applications.api;
 const SOURCE_FLAG = `flags.${MODULE_ID}.source`;
+const HELD_FLAG = `flags.${MODULE_ID}.held`;
 
 // Features of cities, regions and countries are Daggerheart feature items, as on adversaries: a description plus
 // active effects that apply to the actor. The actor can also have effects of its own.
@@ -22,6 +24,7 @@ export async function featureViews(actor) {
 		name: item.name,
 		img: item.img,
 		source: foundry.utils.getProperty(item, SOURCE_FLAG) ?? "",
+		resources: resourceText(featureResources(item)),
 		description: await enrich(actor, item.system.description),
 		effects: item.effects.map(effect => ({ name: effect.name, img: effect.img, disabled: effect.disabled }))
 	})));
@@ -58,18 +61,21 @@ export async function featureGroup(actor, { heading = false, editable = actor.is
 }
 
 /**
- * Adds the features of completed projects to an actor: a copy of the linked feature item, or a plain feature made from
- * the name and description. Each remembers the project it came from.
+ * Adds the features of projects to an actor: a copy of the linked feature item, or a plain feature made from the name
+ * and description. Each remembers the project it came from; one a running project holds also carries its mark.
  */
 export async function grantItems(actor, entries) {
 	const items = [];
-	for (const { grant, source } of entries) {
+	for (const { grant, source, mark } of entries) {
 		const original = grant.uuid ? await fromUuid(grant.uuid) : null;
 		const data = original?.type === "feature"
 			? original.toObject()
 			: { name: grant.name, type: "feature", img: grant.img, system: { description: textToHtml(grant.description) } };
 		delete data._id;
 		foundry.utils.setProperty(data, SOURCE_FLAG, source);
+		if (mark) {
+			foundry.utils.setProperty(data, HELD_FLAG, mark);
+		}
 		items.push(data);
 	}
 	if (items.length) {

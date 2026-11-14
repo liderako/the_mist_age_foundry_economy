@@ -20,7 +20,7 @@
 		<span data-tooltip="MIST_ECO.Resources.population"><i class="{{icons.population}}" inert></i> {{totals.population}}</span>
 		<span data-tooltip="MIST_ECO.Resources.guards"><i class="{{icons.guards}}" inert></i> {{totals.guards}}</span>
 		{{#each counterTotals}}
-		<span data-tooltip="{{label}}"><i class="{{icon}}" inert></i> {{value}}/{{max}}</span>
+		<span data-tooltip="{{label}} — {{about}}" class="{{#if short}}negative{{/if}}"><i class="{{icon}}" inert></i> {{value}}/{{max}}</span>
 		{{/each}}
 	</div>
 </header>

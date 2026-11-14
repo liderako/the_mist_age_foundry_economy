@@ -1,4 +1,7 @@
-import { COSTS, COUNTERS, MODULE_ID, PEOPLE, PROJECT_STATUSES } from "./constants.js";
+import { COSTS, COUNTERS, MODULE_ID, NEEDS, PROJECT_KINDS, PROJECT_STATUSES } from "./constants.js";
+import { getOrganizations, organizationPath } from "./influence.js";
+import { textToHtml } from "./logic.js";
+import { canWriteResources, featureResources, writeResources } from "./resources.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -8,7 +11,7 @@ export class ProjectConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 		super(options);
 		this.actor = actor;
 		const source = actor.system.toObject().projects.find(project => project.id === projectId);
-		// The project being edited. Rewards added or removed stay here until the form is saved.
+		// The project being edited. Features and their resources changed here stay here until the form is saved.
 		this.project = source ?? {
 			...actor.system.schema.getField("projects").element.getInitialValue(),
 			name: game.i18n.localize("MIST_ECO.Project.New")
@@ -23,8 +26,8 @@ export class ProjectConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 		position: { width: 640, height: 760 },
 		form: { handler: ProjectConfig.#onSubmit, closeOnSubmit: true },
 		actions: {
-			addReward: ProjectConfig.#onAddReward,
-			removeReward: ProjectConfig.#onRemoveReward,
+			addResource: ProjectConfig.#onAddResource,
+			removeResource: ProjectConfig.#onRemoveResource,
 			addGrant: ProjectConfig.#onAddGrant,
 			removeGrant: ProjectConfig.#onRemoveGrant,
 			unlinkGrant: ProjectConfig.#onUnlinkGrant
@@ -44,21 +47,26 @@ export class ProjectConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 		const context = await super._prepareContext(options);
 		const project = this.project;
 		const resourceLabel = key => game.i18n.localize(`MIST_ECO.Resources.${key}`);
-		const targets = [...COUNTERS, ...PEOPLE].map(key => ({ value: key, label: resourceLabel(key) }));
+		await this.#loadResources();
+		const rows = (list, keys) => list.map((row, index) => ({ ...row, index, keys: keys.map(key => ({ value: key, label: resourceLabel(key), selected: key === row.key })) }));
 		return Object.assign(context, {
 			project,
 			statuses: PROJECT_STATUSES.map(status => ({ value: status, label: game.i18n.localize(`MIST_ECO.Status.${status}`), selected: status === project.status })),
+			kinds: PROJECT_KINDS.map(kind => ({ value: kind, label: game.i18n.localize(`MIST_ECO.Project.Kind.${kind}`), selected: kind === project.kind })),
+			organizations: [
+				{ value: "", label: game.i18n.localize("MIST_ECO.Organization.None"), selected: !project.organization },
+				...getOrganizations().map(organization => ({ value: organization.uuid, label: organizationPath(organization), selected: organization.uuid === project.organization }))
+					.sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
+			],
+			allies: getOrganizations().map(organization => ({ value: organization.uuid, label: organizationPath(organization), selected: (project.allies ?? []).includes(organization.uuid) }))
+				.sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang)),
 			costs: COSTS.map(key => ({ key, label: resourceLabel(key), value: project.cost[key] })),
-			rewards: project.rewards.map((reward, index) => ({
-				...reward,
-				index,
-				chancePercent: Math.round(reward.chance * 100),
-				targets: targets.map(target => ({ ...target, selected: target.value === reward.target }))
-			})),
 			grants: (project.grants ?? []).map((grant, index) => ({
 				...grant,
 				index,
 				linked: Boolean(grant.uuid),
+				gives: rows(grant.resources.gives, COUNTERS),
+				needs: rows(grant.resources.needs, NEEDS),
 				targets: ["city", "region", "country"].map(value => ({ value, label: game.i18n.localize(`MIST_ECO.Features.Target.${value}`), selected: value === grant.target }))
 			})),
 			others: this.actor.system.projects.filter(other => other.id !== project.id).map(other => ({
@@ -78,11 +86,24 @@ export class ProjectConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 		const grants = this.element.querySelector(".mist-eco-grants");
 		grants?.addEventListener("dragover", event => event.preventDefault());
 		grants?.addEventListener("drop", event => this.#onDropGrant(event));
-		// A fixed reward shows its amount, a range reward its bounds.
-		for (const select of this.element.querySelectorAll("select[data-reward-mode]")) {
-			select.addEventListener("change", () => {
-				select.closest(".mist-eco-reward").dataset.mode = select.value;
-			});
+	}
+
+	/**
+	 * Reads what each feature gives and needs from its item, once: those rows are edited here and written back to the
+	 * item when the project is saved. A feature not made yet starts with none; one the module may not write stays read-only.
+	 */
+	async #loadResources() {
+		const toRows = amounts => Object.entries(amounts).map(([key, amount]) => ({ key, amount }));
+		for (const grant of this.project.grants) {
+			if (grant.resources) {
+				continue;
+			}
+			const item = grant.uuid ? await fromUuid(grant.uuid) : null;
+			const { gives, needs } = featureResources(item);
+			grant.resources = { gives: toRows(gives), needs: toRows(needs) };
+			// Whom it goes to matters too: a city's resources and a region's or country's bonuses are different keys.
+			grant.loaded = JSON.stringify([grant.resources, grant.target]);
+			grant.editable = !item || canWriteResources(item);
 		}
 	}
 
@@ -98,46 +119,54 @@ export class ProjectConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 			status: data.status,
 			days: Math.max(0, Math.round(number(data.days))),
 			progress: Math.max(0, Math.round(number(data.progress))),
-			repeat: Boolean(data.repeat),
+			kind: PROJECT_KINDS.includes(data.kind) ? data.kind : project.kind,
+			organization: data.organization ?? project.organization ?? "",
+			influence: Math.max(0, Math.round(number(data.influence, 1))),
+			// A select of several: one value comes as a string, none as nothing.
+			allies: [data.allies ?? []].flat().filter(uuid => uuid && uuid !== (data.organization ?? project.organization)),
 			workers: Math.max(0, Math.round(number(data.workers))),
 			description: data.description ?? project.description,
 			cost: Object.fromEntries(COSTS.map(key => [key, Math.max(0, Math.round(number(data.cost?.[key])))])),
-			rewards: Object.entries(data.rewards ?? {}).sort(([a], [b]) => Number(a) - Number(b)).map(([, reward]) => ({
-				target: reward.target,
-				mode: reward.mode,
-				amount: number(reward.amount),
-				min: number(reward.min),
-				max: number(reward.max),
-				whole: Boolean(reward.whole),
-				chance: Math.min(1, Math.max(0, number(reward.chance, 100) / 100))
-			})),
 			unlocks: Object.entries(data.unlocks ?? {}).filter(([, checked]) => checked).map(([id]) => id),
-			grants: Object.entries(data.grants ?? {}).sort(([a], [b]) => Number(a) - Number(b)).map(([, grant]) => ({
-				uuid: grant.uuid ?? "",
-				name: grant.name?.trim() || game.i18n.localize("MIST_ECO.Features.New"),
-				img: grant.img || img,
-				description: grant.description ?? "",
-				target: ["city", "region", "country"].includes(grant.target) ? grant.target : "city"
-			}))
+			grants: Object.entries(data.grants ?? {}).sort(([a], [b]) => Number(a) - Number(b)).map(([index, grant]) => {
+				const previous = project.grants[Number(index)] ?? {};
+				const rows = (entries, keys) => Object.entries(entries ?? {}).sort(([a], [b]) => Number(a) - Number(b))
+					.map(([, row]) => ({ key: row.key, amount: Math.round(number(row.amount)) }))
+					.filter(row => keys.includes(row.key));
+				return {
+					uuid: grant.uuid ?? "",
+					name: grant.name?.trim() || game.i18n.localize("MIST_ECO.Features.New"),
+					img: grant.img || img,
+					description: grant.description ?? "",
+					target: ["city", "region", "country"].includes(grant.target) ? grant.target : "city",
+					// Rows of a read-only feature are not in the form; they stay as read.
+					resources: previous.editable === false ? previous.resources : { gives: rows(grant.gives, COUNTERS), needs: rows(grant.needs, NEEDS) },
+					loaded: previous.loaded,
+					editable: previous.editable
+				};
+			})
 		});
 	}
 
-	static async #onAddReward() {
+	/** Adds a row of what a feature gives (Supplies +1) or needs (Materials 1). */
+	static async #onAddResource(event, target) {
 		this.#readForm();
-		this.project.rewards.push({ target: "supplies", mode: "fixed", amount: 1, min: 0, max: 0, whole: true, chance: 1 });
+		const { index, list } = target.dataset;
+		this.project.grants[Number(index)].resources[list].push({ key: list === "gives" ? "supplies" : "materials", amount: 1 });
 		this.render();
 	}
 
-	static async #onRemoveReward(event, target) {
+	static async #onRemoveResource(event, target) {
 		this.#readForm();
-		this.project.rewards.splice(Number(target.dataset.index), 1);
+		const { index, list, row } = target.dataset;
+		this.project.grants[Number(index)].resources[list].splice(Number(row), 1);
 		this.render();
 	}
 
 	/** A new feature to grant takes the project's own image. */
 	static async #onAddGrant() {
 		this.#readForm();
-		(this.project.grants ??= []).push({ name: game.i18n.localize("MIST_ECO.Features.New"), img: this.project.img, description: "", target: "city" });
+		(this.project.grants ??= []).push({ uuid: "", name: game.i18n.localize("MIST_ECO.Features.New"), img: this.project.img, description: "", target: "city" });
 		this.render();
 	}
 
@@ -153,10 +182,10 @@ export class ProjectConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 		this.render();
 	}
 
-	/** Keeps the name and image but stops copying the item, so the feature is made from the text instead. */
+	/** Keeps the name, image and resources but stops copying the item: saving makes a feature item of its own. */
 	static async #onUnlinkGrant(event, target) {
 		this.#readForm();
-		this.project.grants[Number(target.dataset.index)].uuid = "";
+		Object.assign(this.project.grants[Number(target.dataset.index)], { uuid: "", editable: true });
 		this.render();
 	}
 
@@ -166,8 +195,26 @@ export class ProjectConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 		this.render();
 	}
 
+	/**
+	 * Saves the project. A feature made here becomes a feature item of the world; what each feature gives and needs is
+	 * written into its item, so the feature itself shows its resources and every city running the project gets them.
+	 */
 	static async #onSubmit() {
 		this.#readForm();
+		const sum = list => list.reduce((amounts, row) => ({ ...amounts, [row.key]: (amounts[row.key] ?? 0) + row.amount }), {});
+		for (const grant of this.project.grants) {
+			const made = !grant.uuid;
+			if (made) {
+				const item = await Item.implementation.create({ name: grant.name, type: "feature", img: grant.img, system: { description: textToHtml(grant.description) } });
+				grant.uuid = item.uuid;
+			}
+			const item = await fromUuid(grant.uuid);
+			if (canWriteResources(item) && (made || JSON.stringify([grant.resources, grant.target]) !== grant.loaded)) {
+				// A feature for a region or country gives its resources to every city inside.
+				await writeResources(item, { gives: sum(grant.resources.gives), needs: sum(grant.resources.needs) }, grant.target === "city" ? "city" : "area");
+			}
+		}
+		this.project.grants = this.project.grants.map(({ uuid, name, img, description, target }) => ({ uuid, name, img, description, target }));
 		const data = this.actor.system.toObject();
 		const index = data.projects.findIndex(project => project.id === this.project.id);
 		if (index >= 0) {

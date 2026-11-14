@@ -1,0 +1,27 @@
+{{!-- The influence of organizations on a city, region or country; with showCities, in how many of its cities each acts. --}}
+<table class="mist-eco-table mist-eco-influence">
+	<thead>
+		<tr>
+			<th class="name">{{localize "MIST_ECO.Organization.Label"}}</th>
+			<th class="name">{{localize "MIST_ECO.Organization.Kind"}}</th>
+			{{#if showCities}}<th data-tooltip="MIST_ECO.Influence.CitiesHint"><i class="fa-solid fa-city" inert></i></th>{{/if}}
+			<th data-tooltip="MIST_ECO.Influence.RunningHint">{{localize "MIST_ECO.Influence.Running"}}</th>
+			<th data-tooltip="MIST_ECO.Influence.BuildingHint">{{localize "MIST_ECO.Influence.Building"}}</th>
+			<th class="name">{{localize "MIST_ECO.Influence.Share"}}</th>
+			<th>{{localize "MIST_ECO.Influence.LevelLabel"}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each rows}}
+		<tr data-uuid="{{uuid}}">
+			<td class="name"><a data-action="openLink" data-uuid="{{uuid}}"><img src="{{img}}" alt=""> {{name}}</a>{{#if parentName}}<br><span class="hint">{{localize "MIST_ECO.Organization.PartOf" name=parentName}}</span>{{/if}}</td>
+			<td class="name">{{kind}}</td>
+			{{#if ../showCities}}<td>{{cities}}</td>{{/if}}
+			<td>{{projects}} / {{total}}{{#if modifier}} <span class="hint" data-tooltip="MIST_ECO.Influence.ModifierHint">({{modifier}})</span>{{/if}}</td>
+			<td>{{building}}</td>
+			<td class="name"><div class="mist-eco-bar"><span style="width: {{percent}}%"></span></div> {{percent}}%</td>
+			<td class="mist-eco-influence-level level-{{level}}">{{levelLabel}}</td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>

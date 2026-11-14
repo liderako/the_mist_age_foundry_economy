@@ -1,0 +1,26 @@
+<header class="mist-eco-header">
+	<img class="profile" src="{{actor.img}}" alt="{{actor.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}>
+	<div class="title">
+		<input class="name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize "Name"}}">
+		<div class="links">
+			<label class="mist-eco-kind">
+				{{localize "MIST_ECO.Organization.Kind"}}
+				<input type="text" name="system.kind" value="{{system.kind}}" list="mist-eco-kinds-{{actor.id}}" placeholder="{{localize "MIST_ECO.Organization.KindHint"}}">
+				<datalist id="mist-eco-kinds-{{actor.id}}">{{#each kinds}}<option value="{{this}}"></option>{{/each}}</datalist>
+			</label>
+			<label class="mist-eco-kind" data-tooltip="MIST_ECO.Organization.ParentHint">
+				{{localize "MIST_ECO.Organization.Parent"}}
+				<select name="system.parent">
+					{{#each parentOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+				</select>
+				{{#if parent}}<a data-action="openLink" data-uuid="{{parent.uuid}}" data-tooltip="{{parent.name}}"><i class="fa-solid fa-arrow-up-right-from-square" inert></i></a>{{/if}}
+			</label>
+		</div>
+	</div>
+	<div class="summary">
+		<span data-tooltip="MIST_ECO.Influence.Cities"><i class="fa-solid fa-city" inert></i> {{totals.cities}}</span>
+		<span data-tooltip="MIST_ECO.Influence.RunningHint"><i class="fa-solid fa-gears" inert></i> {{totals.projects}}</span>
+		<span data-tooltip="MIST_ECO.Influence.BuildingHint"><i class="fa-solid fa-hammer" inert></i> {{totals.building}}</span>
+		<span data-tooltip="MIST_ECO.Influence.StrongHint"><i class="fa-solid fa-crown" inert></i> {{totals.strong}}</span>
+	</div>
+</header>

@@ -36,6 +36,11 @@
 				"htmlFields": [
 					"description"
 				]
+			},
+			"organization": {
+				"htmlFields": [
+					"description"
+				]
 			}
 		}
 	},

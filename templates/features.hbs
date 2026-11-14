@@ -20,6 +20,7 @@
 						<span class="name">{{name}}</span>
 						{{#if source}}<span class="hint">{{localize "MIST_ECO.Features.From" source=source}}</span>{{/if}}
 					</header>
+					{{#if resources}}<p class="mist-eco-feature-resources"><i class="fa-solid fa-scale-balanced" inert></i> {{resources}}</p>{{/if}}
 					{{#if description}}<div class="description">{{{description}}}</div>{{/if}}
 					{{#if effects.length}}
 					<ul class="mist-eco-feature-effects">

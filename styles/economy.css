@@ -172,6 +172,50 @@
 	opacity: 0.7;
 }
 
+.mist-eco-project-group {
+	margin: 0 0 6px;
+}
+
+.mist-eco-fold > summary {
+	cursor: pointer;
+	list-style: none;
+}
+
+.mist-eco-fold > summary::-webkit-details-marker {
+	display: none;
+}
+
+.mist-eco-fold > summary .fold {
+	font-size: var(--font-size-10, 10px);
+	transition: transform 0.15s;
+}
+
+.mist-eco-fold:not([open]) > summary .fold {
+	transform: rotate(-90deg);
+}
+
+.mist-eco-project-group > summary {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 4px 0;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.mist-eco-project-group > summary img {
+	width: 20px;
+	height: 20px;
+	border: none;
+	object-fit: cover;
+}
+
+.mist-eco-project-group > summary .count {
+	font-size: var(--font-size-12, 12px);
+	font-weight: normal;
+	opacity: 0.7;
+}
+
 .mist-eco-project-list {
 	display: flex;
 	flex-direction: column;
@@ -353,40 +397,51 @@
 	flex: none;
 }
 
-.mist-eco-reward {
+.mist-eco-feature-resources {
+	margin: 2px 0;
+	font-weight: bold;
+}
+
+.mist-eco-grant-resources {
+	grid-column: 2 / -1;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 4px 8px;
-	padding: 4px 0;
-	border-bottom: 1px solid var(--mist-eco-line);
 }
 
-.mist-eco-reward select {
-	width: auto;
-	max-width: 220px;
+.mist-eco-grant-resources .hint {
+	flex-basis: 100%;
+	margin: 0;
 }
 
-.mist-eco-reward input[type="number"] {
-	width: 70px;
+.mist-eco-grant-resources .label {
+	font-weight: bold;
 }
 
-.mist-eco-reward label {
+.mist-eco-resource-row {
 	display: flex;
 	align-items: center;
 	gap: 4px;
 }
 
-.mist-eco-reward[data-mode="fixed"] .range,
-.mist-eco-reward[data-mode="range"] .fixed {
-	display: none;
+.mist-eco-resource-row select {
+	width: auto;
+	max-width: 180px;
 }
 
-.mist-eco-reward button.icon {
+.mist-eco-resource-row input[type="number"] {
+	width: 60px;
+}
+
+.mist-eco-resource-row button.icon {
 	flex: none;
-	width: 28px;
-	height: 28px;
-	margin-left: auto;
+	width: 24px;
+	height: 24px;
+}
+
+.mist-eco-grant-resources > button {
+	width: auto;
 }
 
 .mist-eco-unlocks {
@@ -865,6 +920,22 @@
 	background: var(--mist-eco-accent);
 }
 
+/* Boxes a need uses: still there, but taken. */
+.mist-eco-box.filled.used {
+	background: repeating-linear-gradient(135deg, var(--mist-eco-accent) 0 3px, transparent 3px 6px);
+}
+
+/* Boxes a need lacks, also past the maximum. */
+.mist-eco-box.missing {
+	border: 1px dashed var(--mist-eco-negative);
+	background: color-mix(in srgb, var(--mist-eco-negative) 15%, transparent);
+}
+
+.mist-eco-box.beyond {
+	display: inline-block;
+	opacity: 0.7;
+}
+
 .mist-eco-stepper {
 	display: flex;
 	align-items: center;
@@ -882,6 +953,11 @@
 	text-align: center;
 	font-size: var(--font-size-18, 18px);
 	font-weight: bold;
+}
+
+.mist-eco-need {
+	margin: 0;
+	font-size: var(--font-size-12, 12px);
 }
 
 .mist-eco-max {
@@ -941,4 +1017,55 @@
 	display: flex;
 	align-items: center;
 	gap: 6px;
+}
+
+/* Organizations and their influence */
+.mist-eco-kind {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.mist-eco-kind input {
+	width: 220px;
+}
+
+.mist-eco-influence td.name a {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.mist-eco-influence td.name img {
+	width: 24px;
+	height: 24px;
+	border: none;
+}
+
+.mist-eco-influence .mist-eco-bar {
+	display: inline-block;
+	width: 80px;
+	vertical-align: middle;
+}
+
+.mist-eco-influence-level {
+	font-weight: bold;
+}
+
+.mist-eco-influence-level.level-minor {
+	opacity: 0.7;
+}
+
+.mist-eco-influence-level.level-strong {
+	color: var(--color-level-warning, #d98e04);
+}
+
+.mist-eco-influence-level.level-dominant {
+	color: var(--color-level-error, #c0392b);
+}
+
+/* What a counter means, under its name. */
+.mist-eco-about {
+	margin: 0;
+	line-height: 1.25;
 }

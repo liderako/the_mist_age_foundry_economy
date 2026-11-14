@@ -43,15 +43,27 @@
 		<div class="mist-eco-counter" data-counter data-key="{{key}}">
 			<header>
 				<i class="{{icon}}" inert></i> <span class="label">{{label}}</span>
+				{{#if need}}
+				<span class="value {{#if short}}negative{{/if}}" data-tooltip="{{localize "MIST_ECO.Needs.Left" value=value need=need}}">{{available}} / {{max}}</span>
+				{{else}}
 				<span class="value">{{value}} / {{max}}</span>
+				{{/if}}
 			</header>
+			<p class="mist-eco-about hint">{{about}}</p>
+			{{#if need}}
+			<p class="mist-eco-need {{#if short}}negative{{/if}}" data-tooltip="MIST_ECO.Needs.Hint.{{key}}">
+				{{#if short}}{{localize "MIST_ECO.Needs.Short" need=need missing=missing}}{{else}}{{localize "MIST_ECO.Needs.Used" need=need free=free}}{{/if}}
+				{{#if needParts}}<br><span class="hint">{{needParts}}</span>{{/if}}
+			</p>
+			{{/if}}
 			{{#if boxes}}
 			<div class="mist-eco-boxes">
 				{{#each boxes}}
-				<button type="button" class="mist-eco-box {{#if filled}}filled{{/if}}" data-action="setCounter" data-value="{{index}}" aria-label="{{index}}"></button>
+				<button type="button" class="mist-eco-box {{#if filled}}filled{{/if}} {{#if used}}used{{/if}} {{#if missing}}missing{{/if}}" data-action="setCounter" data-value="{{index}}" aria-label="{{index}}" {{#if used}}data-tooltip="MIST_ECO.Needs.UsedBox"{{else if missing}}data-tooltip="MIST_ECO.Needs.MissingBox"{{/if}}></button>
 				{{else}}
-				<span class="hint">{{localize "MIST_ECO.Counters.NoMax"}}</span>
+				{{#unless beyond.length}}<span class="hint">{{localize "MIST_ECO.Counters.NoMax"}}</span>{{/unless}}
 				{{/each}}
+				{{#each beyond}}<span class="mist-eco-box missing beyond" data-tooltip="MIST_ECO.Needs.BeyondBox"></span>{{/each}}
 			</div>
 			{{else}}
 			<div class="mist-eco-stepper">

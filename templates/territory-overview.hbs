@@ -36,7 +36,7 @@
 				<th class="name">{{localize "MIST_ECO.Territory.Region"}}</th>
 				<th data-tooltip="MIST_ECO.Territory.Cities"><i class="fa-solid fa-city" inert></i></th>
 				{{#each peopleLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
-				{{#each counterLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
+				{{#each counterLabels}}<th data-tooltip="{{label}} — {{about}}"><i class="{{icon}}" inert></i></th>{{/each}}
 				<th data-tooltip="MIST_ECO.Territory.ActiveProjects"><i class="fa-solid fa-hammer" inert></i></th>
 				<th></th>
 			</tr>
@@ -48,7 +48,7 @@
 				<td>{{cities}}</td>
 				<td>{{population}}</td>
 				<td>{{guards}}</td>
-				{{#each counters}}<td>{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
+				{{#each counters}}<td class="{{#if short}}negative{{/if}}">{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
 				<td>{{active}}</td>
 				<td class="controls">{{#if @root.isGM}}<button type="button" class="icon fa-solid fa-link-slash" data-action="detachChild" data-tooltip="MIST_ECO.Territory.Detach"></button>{{/if}}</td>
 			</tr>
@@ -68,7 +68,7 @@
 				<th class="name">{{localize "MIST_ECO.Territory.City"}}</th>
 				{{#if isCountry}}<th>{{localize "MIST_ECO.Territory.Region"}}</th>{{/if}}
 				{{#each peopleLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
-				{{#each counterLabels}}<th data-tooltip="{{label}}"><i class="{{icon}}" inert></i></th>{{/each}}
+				{{#each counterLabels}}<th data-tooltip="{{label}} — {{about}}"><i class="{{icon}}" inert></i></th>{{/each}}
 				<th data-tooltip="MIST_ECO.Territory.ActiveProjects"><i class="fa-solid fa-hammer" inert></i></th>
 				<th class="alerts">{{localize "MIST_ECO.Territory.Alerts"}}</th>
 				<th></th>
@@ -81,7 +81,7 @@
 				{{#if @root.isCountry}}<td>{{region}}</td>{{/if}}
 				<td>{{population}}</td>
 				<td>{{guards}}</td>
-				{{#each counters}}<td>{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
+				{{#each counters}}<td class="{{#if short}}negative{{/if}}">{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
 				<td>{{active}}</td>
 				<td class="alerts negative">{{alerts}}</td>
 				<td class="controls">{{#if @root.isGM}}{{#unless @root.isCountry}}<button type="button" class="icon fa-solid fa-link-slash" data-action="detachChild" data-tooltip="MIST_ECO.Territory.Detach"></button>{{/unless}}{{/if}}</td>
@@ -94,7 +94,7 @@
 				{{#if isCountry}}<td></td>{{/if}}
 				<td>{{totals.population}}</td>
 				<td>{{totals.guards}}</td>
-				{{#each totals.counters}}<td>{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
+				{{#each totals.counters}}<td class="{{#if short}}negative{{/if}}">{{value}}<span class="hint">/{{max}}</span></td>{{/each}}
 				<td>{{totals.active}}</td>
 				<td></td>
 				<td></td>
@@ -103,6 +103,14 @@
 	</table>
 	{{else}}
 	<p class="hint">{{localize "MIST_ECO.Territory.NoCities"}}</p>
+	{{/if}}
+
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Influence.Title"}} <span class="count">{{influence.length}}</span></h3>
+	<p class="hint">{{localize "MIST_ECO.Influence.AreaHint"}}</p>
+	{{#if influence.length}}
+	{{> "modules/mist-age-economy/templates/influence-table.hbs" rows=influence showCities=true}}
+	{{else}}
+	<p class="hint">{{localize "MIST_ECO.Influence.NoneInArea"}}</p>
 	{{/if}}
 
 	<fieldset class="mist-eco-description">

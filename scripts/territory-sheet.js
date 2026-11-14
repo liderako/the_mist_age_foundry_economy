@@ -1,9 +1,10 @@
-import { CITY_TYPE, COUNTERS, COUNTRY_TYPE, DEFAULT_CITY_ICON, DEFAULT_REGION_ICON, ICONS, MODULE_ID, PEOPLE, REGION_TYPE } from "./constants.js";
+import { CITY_TYPE, COUNTERS, COUNTRY_TYPE, DEFAULT_CITY_ICON, DEFAULT_REGION_ICON, ICONS, MODULE_ID, NEEDS, ORGANIZATION_TYPE, PEOPLE, REGION_TYPE } from "./constants.js";
 import { advanceButton, alertText, askDays } from "./days.js";
 import { FEATURE_ACTIONS, featureGroup } from "./features.js";
 import { effectiveCounters, getCities, getCountry, getCountryCities, getRegions } from "./hierarchy.js";
+import { influenceRows } from "./influence.js";
 import { getAlerts } from "./logic.js";
-import { currentDate, worldDay } from "./time.js";
+import { currentDate, economyDay } from "./time.js";
 import { localize, signed } from "./city-sheet.js";
 
 const { HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -13,19 +14,23 @@ function sum(values) {
 	return values.reduce((total, value) => total + value, 0);
 }
 
-/** One row of a table of cities: people, counters after every effect, active projects and alerts. */
+/**
+ * One row of a table of cities: people, counters after every effect, active projects and alerts. Supplies and
+ * Materials show what is left once the city's needs have taken their share, below zero when they lack.
+ */
 function cityRow(city) {
 	const system = city.system;
 	const counters = effectiveCounters(city);
+	const left = key => counters[key].value - (NEEDS.includes(key) ? system.needs[key] : 0);
 	return {
 		uuid: city.uuid,
 		name: city.name,
 		img: city.img,
 		population: system.population,
 		guards: system.guards,
-		counters: COUNTERS.map(key => counters[key]),
+		counters: COUNTERS.map(key => ({ value: left(key), max: counters[key].max, short: left(key) < 0 })),
 		active: system.projects.filter(project => project.status === "active").length,
-		alerts: alertText(getAlerts({ groups: system.groups, projects: system.projects, counters }))
+		alerts: alertText(getAlerts({ groups: system.groups, projects: system.projects, needs: system.needs, counters }))
 	};
 }
 
@@ -34,7 +39,10 @@ function totals(rows) {
 	return {
 		population: sum(rows.map(row => row.population)),
 		guards: sum(rows.map(row => row.guards)),
-		counters: COUNTERS.map((key, index) => ({ value: sum(rows.map(row => row.counters[index].value)), max: sum(rows.map(row => row.counters[index].max)) })),
+		counters: COUNTERS.map((key, index) => {
+			const value = sum(rows.map(row => row.counters[index].value));
+			return { value, max: sum(rows.map(row => row.counters[index].max)), short: value < 0 };
+		}),
 		active: sum(rows.map(row => row.active))
 	};
 }
@@ -125,15 +133,17 @@ class TerritorySheet extends HandlebarsApplicationMixin(foundry.applications.she
 			editable: this.isEditable,
 			date: currentDate(),
 			icons: ICONS,
-			counterLabels: COUNTERS.map(key => ({ icon: ICONS[key], label: localize(`Resources.${key}`) })),
+			counterLabels: COUNTERS.map(key => ({ icon: ICONS[key], label: localize(`Resources.${key}`), about: localize(`Counters.About.${key}`) })),
 			peopleLabels: PEOPLE.map(key => ({ icon: ICONS[key], label: localize(`Resources.${key}`) })),
 			country: country && { uuid: country.uuid, name: country.name, img: country.img },
 			bonuses: bonusViews(actor),
 			regions,
 			cities: cityRows.map((row, index) => ({ ...row, region: regionName(cities[index]) })),
 			totals: cityTotals,
-			counterTotals: COUNTERS.map((key, index) => ({ icon: ICONS[key], label: localize(`Resources.${key}`), ...cityTotals.counters[index] })),
+			counterTotals: COUNTERS.map((key, index) => ({ icon: ICONS[key], label: localize(`Resources.${key}`), about: localize(`Counters.About.${key}`), ...cityTotals.counters[index] })),
 			childLabel: localize(isCountry ? "Territory.NewRegion" : "Territory.NewCity"),
+			// Over every city inside, not only those this user may see: influence is a fact of the world.
+			influence: influenceRows(isCountry ? getCountryCities(actor) : getCities(actor)),
 			featureGroups: [await featureGroup(actor, { editable: this.isEditable })],
 			enrichedDescription: await enrich(actor.system.description)
 		});
@@ -172,7 +182,7 @@ class TerritorySheet extends HandlebarsApplicationMixin(foundry.applications.she
 		}
 		const system = { [this.childField]: this.document.uuid };
 		if (!isCountry) {
-			system.day = worldDay();
+			system.day = economyDay();
 		}
 		const child = await Actor.implementation.create({
 			name,
@@ -211,17 +221,21 @@ export class CountrySheet extends TerritorySheet {
 	static PARTS = RegionSheet.PARTS;
 }
 
-/** Rerenders open sheets of the economy when cities, regions or countries change, or their features and effects. */
+/**
+ * Rerenders open sheets of the economy when cities, regions, countries or organizations change, or their features and
+ * effects: an organization's sheet shows the projects of cities, and a city's the organizations behind its projects.
+ */
 export function registerRefresh() {
+	const types = [CITY_TYPE, REGION_TYPE, COUNTRY_TYPE, ORGANIZATION_TYPE];
 	const render = foundry.utils.debounce(() => {
 		for (const app of foundry.applications.instances.values()) {
-			if (app.rendered && [CITY_TYPE, REGION_TYPE, COUNTRY_TYPE].includes(app.document?.type)) {
+			if (app.rendered && types.includes(app.document?.type)) {
 				app.render();
 			}
 		}
 	}, 150);
 	const onActor = actor => {
-		if ([CITY_TYPE, REGION_TYPE, COUNTRY_TYPE].includes(actor?.type)) {
+		if (types.includes(actor?.type)) {
 			render();
 		}
 	};

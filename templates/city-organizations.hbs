@@ -1,0 +1,9 @@
+<section class="tab mist-eco-organizations {{tab.cssClass}}" data-tab="organizations" data-group="primary">
+	<h3 class="mist-eco-section">{{localize "MIST_ECO.Influence.Title"}} <span class="count">{{influence.length}}</span></h3>
+	<p class="hint">{{localize "MIST_ECO.Influence.CityHint"}}</p>
+	{{#if influence.length}}
+	{{> "modules/mist-age-economy/templates/influence-table.hbs" rows=influence}}
+	{{else}}
+	<p class="hint">{{localize "MIST_ECO.Influence.NoneInCity"}}</p>
+	{{/if}}
+</section>
